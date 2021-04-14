@@ -429,7 +429,9 @@ var the_vue = new Vue({
         if (self.status.logged_in) {
             self.push_toast('success', `你好，${LC.User.current().data.username}，欢迎回来！`, 1000);
             // self.status.current_page = 1;
-            if (self.hash!="#"&&self.hash[0]=="#") {
+            if (self.hash=="") {
+                self.go_hash("notes");
+            } else if (self.hash!="#"&&self.hash[0]=="#") {
                 self.go_hash(self.hash.slice(1,self.hash.length));
             };
         };
