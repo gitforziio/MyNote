@@ -407,13 +407,13 @@
           <div class="weui-cell weui-cell_active">
             <div class="weui-cell__hd"><label class="weui-label">用户名</label></div>
             <div class="weui-cell__bd">
-              <input id="js_input" class="weui-input" placeholder="请输入用户名" v-model="user.username">
+              <input id="js_input-username" class="weui-input" placeholder="请输入用户名" v-model="user.username">
             </div>
           </div>
           <div class="weui-cell weui-cell_active">
             <div class="weui-cell__hd"><label class="weui-label">密码</label></div>
             <div class="weui-cell__bd">
-              <input id="js_input" class="weui-input" type="password" placeholder="请输入密码" v-model="user.password">
+              <input id="js_input-password" class="weui-input" type="password" placeholder="请输入密码" v-model="user.password">
             </div>
           </div>
         </div>
@@ -437,7 +437,7 @@
       <p class="weui-form__tips">热烈欢迎</p>
     </div>
     <div class="weui-form__opr-area">
-      <button class="weui-btn weui-btn_primary" :class="{'weui-btn_disabled':(user.username==''||user.password==''), 'weui-btn_loading':status.loginning}" href="#" id="login" :disabled="(user.username==''||user.password=='')" v-on:click="login"><span v-if="status.loginning" class="weui-primary-loading weui-primary-loading_transparent"><i class="weui-primary-loading__dot"></i></span>登录</button>
+      <button class="weui-btn weui-btn_primary" :class="{'weui-btn_disabled':(user.username==''||user.password==''||lean_cloud_keys.appId==''||lean_cloud_keys.appKey==''||lean_cloud_keys.serverURL==''), 'weui-btn_loading':status.loginning}" href="#" id="login" :disabled="(user.username==''||user.password==''||lean_cloud_keys.appId==''||lean_cloud_keys.appKey==''||lean_cloud_keys.serverURL=='')" v-on:click="login"><span v-if="status.loginning" class="weui-primary-loading weui-primary-loading_transparent"><i class="weui-primary-loading__dot"></i></span>登录</button>
     </div>
     <div class="weui-form__tips-area">
       <p class="weui-form__tips">^_^</p>

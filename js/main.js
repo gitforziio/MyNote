@@ -155,7 +155,12 @@ var the_vue = new Vue({
                 self.user.username = self.settings.remember_user ? self.user.username : '';
                 self.status.current_page = 1;
                 // self.refresh();
-            }).catch(({ error }) => self.push_toptip('danger', error, 3000));
+            }).catch(({ error }) => {
+                self.status.loginning = false;
+                self.push_toptip('danger', error, 3000);
+                self.user.password = '';
+                self.user.username = self.settings.remember_user ? self.user.username : '';
+            });
         },
 
         logOut: function() {
@@ -405,7 +410,7 @@ var the_vue = new Vue({
     created() {
         let self = this;
         self.readDataFromLocalStorage();
-        if (self.lean_cloud_keys.appId) {
+        if (self.lean_cloud_keys.appId&&self.lean_cloud_keys.appKey&&self.lean_cloud_keys.serverURL) {
             try {
                 LC.init(self.lean_cloud_keys);
                 self.status.lc_initiated = true;
@@ -413,6 +418,9 @@ var the_vue = new Vue({
             } catch(error) {
                 self.push_toptip('warn', `LeanCloud自动初始化出现问题`, 2000);
             };
+        };
+        if (self.status.loginning) {
+            self.status.loginning = false;
         };
         if (self.status.lc_initiated) {self.status.logged_in = LC.User.current() ? true : false;};
         if( ("onhashchange" in window) && ((typeof document.documentMode==="undefined") || document.documentMode==8)) {
