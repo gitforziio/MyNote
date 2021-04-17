@@ -6,7 +6,7 @@ var the_vue = new Vue({
     el: '#app',
     data: {
         "app_name": "MyNote",
-        "fields": ["lean_cloud_keys_str", "user", "settings", "status", "ui"],
+        "fields": ["lean_cloud_keys_str", "user", "settings", "status", "ui", "editor"],
         //
         "hash": "",
         "lean_cloud_keys_str": "",
@@ -38,7 +38,7 @@ var the_vue = new Vue({
             dark_mode_follow_system: true,
         },
         //
-        "pages": ["login", "main", "welcome", "settings", "add_post_gzh", "please"],
+        "pages": ["login", "main", "welcome", "settings", "add_post_gzh", "please" ,"edit"],
         "tabs": [
             {
                 name: "notes",
@@ -77,6 +77,15 @@ var the_vue = new Vue({
             toptips_last_idx: 1,
             toptips: [],
         },
+        "editor": {
+            objectId: "",
+            content: "",
+            owner: "",
+            tags: [],
+            is_draft: false,
+            pinned: false,
+            deleted: false,
+        },
         "tools_gzh": {
             url: "",
             is_analyzing: false,
@@ -101,6 +110,56 @@ var the_vue = new Vue({
 
     methods: {
 
+        sync: function() {
+            let self = this;
+            let Note = LC.CLASS("Note");
+            return Note.orderBy(["createdAt", "updatedAt", "content"]).find()
+            .then((x) => {
+                self.notes = x;
+                self.push_toptip('success', `笔记清单同步成功`);
+            })
+            .catch(({ error }) => self.push_toptip('warn', error));
+        },
+
+        editor_save: function() {
+            let self = this;
+            let note = {
+                content: self.editor.content,
+                owner: LC.User.current(),
+                // is_draft: self.editor.is_draft,
+                // pinned: self.editor.pinned,
+                // deleted: self.editor.deleted,
+            };
+            let Note = LC.CLASS("Note");
+            if (self.editor.objectId) {
+                let that = Note.object(self.editor.objectId);
+                return that.update(note)
+                .then((x)=>{
+                    self.push_toptip('success', `成功更新笔记「${x.objectId}」`);
+                    return Note.object(x.objectId).get();
+                })
+                .then((x)=>{
+                    self.editor.objectId = x.objectId;
+                    self.notes = self.notes.filter(y=>y.objectId!=x.objectId);
+                    self.notes.push(x);
+                    self.go_hash("notes");
+                })
+                .catch(({ error }) => self.push_toptip('warn', error));
+            } else {
+                return Note.add(note)
+                .then((x)=>{
+                    self.push_toptip('success', `成功创建笔记「${x.objectId}」`);
+                    return Note.object(x.objectId).get();
+                })
+                .then((x)=>{
+                    self.editor.objectId = x.objectId;
+                    self.notes.push(x);
+                    self.go_hash("notes");
+                })
+                .catch(({ error }) => self.push_toptip('warn', error));
+            };
+        },
+
         go_tab: function(x) {
             let self = this;
             location.hash=`#${self.tabs[x].name}`;
@@ -113,7 +172,7 @@ var the_vue = new Vue({
 
         go_hash: function(hash) {
             let self = this;
-            console.log(`go to: ${hash}`);
+            // console.log(`go to: ${hash}`);
             let _map = {
                 'notes': function() {
                     self.go_tab(0);
@@ -141,10 +200,29 @@ var the_vue = new Vue({
                 "page-please": function() {
                     self.status.current_page = 5;
                 },
+                'page-edit': function() {
+                    self.editor.objectId = "";
+                    self.status.current_page = 6;
+                },
             };
             if (self.status.logged_in) {
                 if (hash in _map) {
                     _map[hash]();
+                } else if (hash.slice(0,4)=="post") {
+                    let noteID = hash.slice(5, hash.length);
+                    self.push_toptip('info', `${noteID}`);
+                    //
+                    let xx = self.notes.filter(x=>x.objectId==noteID)[0];
+                    if (xx) {
+                        xxx = xx.data;
+                        xxx.contentOld = xxx.content;
+                        xxx.objectId = xx.objectId;
+                        xxx.createdAt = xx.createdAt;
+                        xxx.updatedAt = xx.updatedAt;
+                    } else {
+                        self.editor.objectId = "";
+                    };
+                    self.status.current_page = 6;
                 } else {
                     self.go_hash(`notes`);
                 };
@@ -525,6 +603,7 @@ var the_vue = new Vue({
         if (self.status.lc_initiated) {self.status.logged_in = LC.User.current() ? true : false;};
         if (self.status.logged_in) {
             self.push_toast('success', `你好，${self.status.username}，欢迎回来！`, 1000);
+            self.sync();
             if (location.hash=="") {
                 console.log(`self.hash==""`);
                 self.go_hash("notes");
