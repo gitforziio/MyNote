@@ -34,6 +34,7 @@
     .vh-100 {height: 100vh;}
     .title-bar {font-size: 16px; display: flex;}
     .page-title {margin: 6px 0 8px; font-size: 22px; line-height: 28px;}
+    .edit-content {height: 60vh}
   </style>
   <style type="text/css">
     * {transition: all 0.25s;}
@@ -113,19 +114,19 @@
                           <!-- <div class="weui-media-box__ft"><p>🖋</p></div> -->
                         </a>
                       </div>
-                      <div v-for="note in notes">
-                        <a :href="`#post-${note.perma}`" class="weui-media-box weui-media-box_appmsg">
-                          <!-- <div class="weui-media-box__hd"><p>📃</p></div> -->
+                      <div v-if="notes.length" v-for="note in notes">
+                        <a :href="`#post-${note.objectId}`" class="weui-media-box weui-media-box_appmsg">
+                          <div class="weui-media-box__hd"><p>📃</p></div>
                           <div class="weui-media-box__bd">
-                            <h4 class="weui-media-box__title">备忘标题</h4>
-                            <p class="weui-media-box__desc">备忘描述……</p>
+                            <h4 class="weui-media-box__title">{{get_title(note.data?.content)}}</h4>
+                            <p class="weui-media-box__desc">{{note.data?.content}}</p>
                             <ul class="weui-media-box__info">
                               <li class="weui-media-box__info__meta">文字来源</li>
                               <li class="weui-media-box__info__meta">时间</li>
                               <li class="weui-media-box__info__meta weui-media-box__info__meta_extra">其它信息</li>
                             </ul>
                           </div>
-                          <!-- <div class="weui-media-box__ft"><p>🖋</p></div> -->
+                          <div class="weui-media-box__ft"><p>🖋</p></div>
                         </a>
                       </div>
                     </div>
@@ -429,6 +430,42 @@
     </div>
     <div class="weui-form__opr-area">
       <button class="weui-btn weui-btn_primary" id="please-ok" v-on:click="go_hash('tools')">好的</button>
+    </div>
+    <div class="weui-form__tips-area">
+      <p class="weui-form__tips">^_^</p>
+    </div>
+    <div class="weui-form__extra-area">
+      <div class="weui-footer">
+        <p class="weui-footer__links">
+          <a href="#tools" class="weui-footer__link">返回</a>
+        </p>
+        <p class="weui-footer__text">L❤️C</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- edit -->
+<div class="layer layer-upper pp _page _js_show" id="page-edit" ref="page_edit" key="page_edit" v-if="pages[status.current_page]=='edit'">
+  <div class="weui-form">
+    <!-- <div class="weui-form__text-area">
+      <h2 class="weui-form__title">编辑内容</h2>
+      <div class="weui-form__desc">编辑内容</div>
+    </div> -->
+    <div class="weui-form__control-area">
+      <div class="weui-cells__group weui-cells__group_form">
+        <div class="weui-cells__title">内容</div>
+        <div class="weui-cells weui-cells_form">
+          <div class="weui-cell ">
+            <div class="weui-cell__bd">
+              <textarea class="weui-textarea edit-content" placeholder="编辑内容" v-model="editor.content"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="weui-form__opr-area">
+      <button class="weui-btn weui-btn_primary" id="please-ok" v-on:click="editor_save">保存</button>
     </div>
     <div class="weui-form__tips-area">
       <p class="weui-form__tips">^_^</p>
