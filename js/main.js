@@ -1,3 +1,7 @@
+function get_title(text) {
+    return text.trimLeft().split("\n")[0].slice(0,36)
+}
+
 var the_vue = new Vue({
     el: '#app',
     data: {
@@ -15,6 +19,7 @@ var the_vue = new Vue({
             password: "",
         },
         //
+        "notes": [],
         //
         "status": {
             lc_initiated: false,
@@ -30,7 +35,7 @@ var the_vue = new Vue({
             dark_mode_follow_system: true,
         },
         //
-        "pages": ["login", "main", "welcome", "settings", "add_post_gzh"],
+        "pages": ["login", "main", "welcome", "settings", "add_post_gzh", "please"],
         "tabs": [
             {
                 name: "notes",
@@ -127,6 +132,9 @@ var the_vue = new Vue({
                     };
                     self.status.current_page = 4;
                 },
+                "page-please": function() {
+                    self.status.current_page = 5;
+                },
             };
             if (hash in _map) {
                 _map[hash]();
@@ -153,7 +161,7 @@ var the_vue = new Vue({
                 // self.status.logged_in = true;
                 self.user.password = '';
                 self.user.username = self.settings.remember_user ? self.user.username : '';
-                self.status.current_page = 1;
+                self.go_hash('notes');
                 // self.refresh();
             }).catch(({ error }) => {
                 self.status.loginning = false;
@@ -381,18 +389,29 @@ var the_vue = new Vue({
         },
         readDataFromLocalStorage: function() {
             let self = this;
+            // if(window.localStorage){
+            //     for (let field of self.fields) {
+            //         if (window.localStorage[`${self.app_name}:${field}`] && window.localStorage[`${self.app_name}:${field}`]!="undefined") {
+            //             self[field] = JSON.parse(window.localStorage[`${self.app_name}:${field}`]);
+            //         };
+            //     };
+            // };
             for (let field of self.fields) {
-                if (window.localStorage[`${self.app_name}:${field}`] && window.localStorage[`${self.app_name}:${field}`]!="undefined") {
-                    self[field] = JSON.parse(window.localStorage[`${self.app_name}:${field}`]);
+                let it = store.get(`${self.app_name}:${field}`);
+                if (it) {
+                    self[field] = it;
                 };
             };
         },
         saveDataToLocalStorage: function() {
             let self = this;
-            if(window.localStorage){
-                for (let field of self.fields) {
-                    window.localStorage[`${self.app_name}:${field}`] = JSON.stringify(self[field]);
-                };
+            // if(window.localStorage){
+            //     for (let field of self.fields) {
+            //         window.localStorage[`${self.app_name}:${field}`] = JSON.stringify(self[field]);
+            //     };
+            // };
+            for (let field of self.fields) {
+                store.set(`${self.app_name}:${field}`, self[field]);
             };
         },
     },
@@ -436,11 +455,11 @@ var the_vue = new Vue({
         };
         if (self.status.logged_in) {
             self.push_toast('success', `你好，${LC.User.current().data.username}，欢迎回来！`, 1000);
-            // self.status.current_page = 1;
-            if (self.hash=="") {
+            if (location.hash=="") {
+                console.log(`self.hash==""`);
                 self.go_hash("notes");
-            } else if (self.hash!="#"&&self.hash[0]=="#") {
-                self.go_hash(self.hash.slice(1,self.hash.length));
+            } else if (location.hash!="#"&&location.hash[0]=="#") {
+                self.go_hash(location.hash.slice(1,location.hash.length));
             };
         };
         if (self.settings.dark_mode_follow_system) {

@@ -25,11 +25,14 @@
   <style type="text/css">
     .weui-tab__panel .weui-cell_example .weui-cell__hd img {width: 20px; height: 20px; display: block; margin-right: 16px;}
     .weui-tab__panel .demo_badge_cells .weui-cell__bd .demo_badge_desc {font-size: 13px; color: #888;}
+    .weui-panel__hd .weui-flex .weui-flex__item .placeholder {text-align: center;}
   </style>
   <style type="text/css">
     .welcome_cover {position:absolute; top:0; right:0; bottom:0; left:0; background-color:var(--weui-BG-0); z-index: 90000;}
     .wrap-inline {display: inline-block; position: relative;}
     .vh-100 {height: 100vh;}
+    .title-bar {font-size: 16px; display: flex;}
+    .page-title {margin: 6px 0 8px; font-size: 22px; line-height: 28px;}
   </style>
   <style type="text/css">
     * {transition: all 0.25s;}
@@ -62,125 +65,105 @@
 
 <transition name="page_anim" _mode="out-in" mode="in-out">
 
-<!-- welcome -->
-<!-- <div class="layer pp _page _js_show" id="page-welcome" ref="page_welcome" key="page_welcome" v-if="pages[status.current_page]=='welcome'">
-  <div class="page__bd" style="height: 100%;">
-    <div class="weui-form__text-area">
-      <h2 class="weui-form__title">MyNote</h2>
-    </div>
-  </div>
-</div> -->
-
 <!-- main -->
 <div class="layer pp _page _js_show" id="page-main" ref="page_main" key="page_main" v-if="pages[status.current_page]=='main'">
   <div class="page__bd" style="height: 100%;">
     <div class="weui-tab">
       <transition name="slide" mode="out-in">
+
+        <!-- notes -->
         <div class="weui-tab__panel" id="notes" key="tab_0" v-if="ui.tab_current==0">
+          <!-- <div class="page__bd"> -->
+            <div class="weui-tab">
+              <div class="weui-tabbar">
+                <div class="weui-tabbar__item">
+                  <div class="weui-flex title-bar">
+                      <div><div class="placeholder"><i class="fas fa-sync"></i></div></div>
+                      <div class="weui-flex__item"><h2 class="page-title">MyNote</h2></div>
+                      <div><i class="fa fa-plus-square"></i></div>
+                  </div>
+                </div>
+              </div>
+              <div class="weui-tab__panel">
 
+                <div class="page__bd">
 
-
-
-<div class="page__bd">
-        <div class="weui-panel weui-panel_access">
-            <div class="weui-panel__hd">图文组合列表</div>
-            <div class="weui-panel__bd">
-                <a href="#" class="weui-media-box weui-media-box_appmsg">
-                    <!-- <div class="weui-media-box__hd">
+                  <div class="weui-panel weui-panel_access">
+                    <!-- <div class="weui-panel__hd">
+                      <div class="weui-flex">
+                        <div _class="weui-flex__item"><div class="placeholder"><i class="fas fa-sync"></i></div></div>
+                        <div class="weui-flex__item"><div class="placeholder">我的笔记</div></div>
+                        <div _class="weui-flex__item"><div class="placeholder"><i class="fas fa-plus-square"></i></div></div>
+                      </div>
                     </div> -->
-                    <div class="weui-media-box__bd">
-                        <h4 class="weui-media-box__title">标题一</h4>
-                        <p class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</p>
-                    </div>
-                </a>
-                <a href="#" class="weui-media-box weui-media-box_appmsg">
-                    <div class="weui-media-box__hd">
-                        <img class="weui-media-box__thumb" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAMAAAAOusbgAAAAeFBMVEUAwAD///+U5ZTc9twOww7G8MYwzDCH4YcfyR9x23Hw+/DY9dhm2WZG0kbT9NP0/PTL8sux7LFe115T1VM+zz7i+OIXxhes6qxr2mvA8MCe6J6M4oz6/frr+us5zjn2/fa67rqB4IF13XWn6ad83nxa1loqyirn+eccHxx4AAAC/klEQVRo3u2W2ZKiQBBF8wpCNSCyLwri7v//4bRIFVXoTBBB+DAReV5sG6lTXDITiGEYhmEYhmEYhmEYhmEY5v9i5fsZGRx9PyGDne8f6K9cfd+mKXe1yNG/0CcqYE86AkBMBh66f20deBc7wA/1WFiTwvSEpBMA2JJOBsSLxe/4QEEaJRrASP8EVF8Q74GbmevKg0saa0B8QbwBdjRyADYxIhqxAZ++IKYtciPXLQVG+imw+oo4Bu56rjEJ4GYsvPmKOAB+xlz7L5aevqUXuePWVhvWJ4eWiwUQ67mK51qPj4dFDMlRLBZTqF3SDvmr4BwtkECu5gHWPkmDfQh02WLxXuvbvC8ku8F57GsI5e0CmUwLz1kq3kD17R1In5816rGvQ5VMk5FEtIiWislTffuDpl/k/PzscdQsv8r9qWq4LRWX6tQYtTxvI3XyrwdyQxChXioOngH3dLgOFjk0all56XRi/wDFQrGQU3Os5t0wJu1GNtNKHdPqYaGYQuRDfbfDf26AGLYSyGS3ZAK4S8XuoAlxGSdYMKwqZKM9XJMtyqXi7HX/CiAZS6d8bSVUz5J36mEMFDTlAFQzxOT1dzLRljjB6+++ejFqka+mXIe6F59mw22OuOw1F4T6lg/9VjL1rLDoI9Xzl1MSYDNHnPQnt3D1EE7PrXjye/3pVpr1Z45hMUdcACc5NVQI0bOdS1WA0wuz73e7/5TNqBPhQXPEFGJNV2zNqWI7QKBd2Gn6AiBko02zuAOXeWIXjV0jNqdKegaE/kJQ6Bfs4aju04lMLkA2T5wBSYPKDGF3RKhFYEa6A1L1LG2yacmsaZ6YPOSAMKNsO+N5dNTfkc5Aqe26uxHpx7ZirvgCwJpWq/lmX1hA7LyabQ34tt5RiJKXSwQ+0KU0V5xg+hZrd4Bn1n4EID+WkQdgLfRNtvil9SPfwy+WQ7PFBWQz6dGWZBLkeJFXZGCfLUjCgGgqXo5TuSu3cugdcTv/HjqnBTEMwzAMwzAMwzAMwzAMw/zf/AFbXiOA6frlMAAAAABJRU5ErkJggg==" alt="">
-                    </div>
-                    <div class="weui-media-box__bd">
-                        <h4 class="weui-media-box__title">标题二</h4>
-                        <p class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</p>
-                    </div>
-                </a>
-            </div>
-            <div class="weui-panel__ft">
-                <a href="#" class="weui-cell weui-cell_active weui-cell_access weui-cell_link">
-                    <div class="weui-cell__bd">查看更多</div>
-                    <span class="weui-cell__ft"></span>
-                </a>
-            </div>
-        </div>
-        <div class="weui-panel weui-panel_access">
-            <div class="weui-panel__hd">文字组合列表</div>
-            <div class="weui-panel__bd">
-                <div class="weui-media-box weui-media-box_text">
-                    <h4 class="weui-media-box__title">标题一</h4>
-                    <p class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</p>
-                </div>
-                <div class="weui-media-box weui-media-box_text">
-                    <h4 class="weui-media-box__title">标题二</h4>
-                    <p class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</p>
-                </div>
-            </div>
-            <div class="weui-panel__ft">
-                <a href="#" class="weui-cell weui-cell_active weui-cell_access weui-cell_link">
-                    <div class="weui-cell__bd">查看更多</div>
-                    <span class="weui-cell__ft"></span>
-                </a>
-            </div>
-        </div>
-        <div class="weui-panel">
-            <div class="weui-panel__hd">小图文组合列表</div>
-            <div class="weui-panel__bd">
-                <div class="weui-media-box weui-media-box_small-appmsg">
-                    <div class="weui-cells">
-                        <a class="weui-cell weui-cell_active weui-cell_access weui-cell_example" href="#">
-                            <div class="weui-cell__hd"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC4AAAAuCAMAAABgZ9sFAAAAVFBMVEXx8fHMzMzr6+vn5+fv7+/t7e3d3d2+vr7W1tbHx8eysrKdnZ3p6enk5OTR0dG7u7u3t7ejo6PY2Njh4eHf39/T09PExMSvr6+goKCqqqqnp6e4uLgcLY/OAAAAnklEQVRIx+3RSRLDIAxE0QYhAbGZPNu5/z0zrXHiqiz5W72FqhqtVuuXAl3iOV7iPV/iSsAqZa9BS7YOmMXnNNX4TWGxRMn3R6SxRNgy0bzXOW8EBO8SAClsPdB3psqlvG+Lw7ONXg/pTld52BjgSSkA3PV2OOemjIDcZQWgVvONw60q7sIpR38EnHPSMDQ4MjDjLPozhAkGrVbr/z0ANjAF4AcbXmYAAAAASUVORK5CYII=" alt=""></div>
-                            <div class="weui-cell__bd weui-cell_primary">
-                                <p>文字标题</p>
-                            </div>
-                            <span class="weui-cell__ft"></span>
+                    <div class="weui-panel__bd">
+                      <div>
+                        <a href="#" class="weui-media-box weui-media-box_appmsg">
+                          <!-- <div class="weui-media-box__hd"><p>📃</p></div> -->
+                          <div class="weui-media-box__bd">
+                            <h4 class="weui-media-box__title">备忘标题</h4>
+                            <p class="weui-media-box__desc">备忘描述……</p>
+                            <ul class="weui-media-box__info">
+                              <li class="weui-media-box__info__meta">文字来源</li>
+                              <li class="weui-media-box__info__meta">时间</li>
+                              <li class="weui-media-box__info__meta weui-media-box__info__meta_extra">其它信息</li>
+                            </ul>
+                          </div>
+                          <!-- <div class="weui-media-box__ft"><p>🖋</p></div> -->
                         </a>
-                        <a class="weui-cell weui-cell_active weui-cell_access weui-cell_example" href="#">
-                            <div class="weui-cell__hd"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC4AAAAuCAMAAABgZ9sFAAAAVFBMVEXx8fHMzMzr6+vn5+fv7+/t7e3d3d2+vr7W1tbHx8eysrKdnZ3p6enk5OTR0dG7u7u3t7ejo6PY2Njh4eHf39/T09PExMSvr6+goKCqqqqnp6e4uLgcLY/OAAAAnklEQVRIx+3RSRLDIAxE0QYhAbGZPNu5/z0zrXHiqiz5W72FqhqtVuuXAl3iOV7iPV/iSsAqZa9BS7YOmMXnNNX4TWGxRMn3R6SxRNgy0bzXOW8EBO8SAClsPdB3psqlvG+Lw7ONXg/pTld52BjgSSkA3PV2OOemjIDcZQWgVvONw60q7sIpR38EnHPSMDQ4MjDjLPozhAkGrVbr/z0ANjAF4AcbXmYAAAAASUVORK5CYII=" alt=""></div>
-                            <div class="weui-cell__bd weui-cell_primary">
-                                <p>文字标题</p>
-                            </div>
-                            <span class="weui-cell__ft"></span>
+                      </div>
+                      <div v-for="note in notes">
+                        <a :href="`#post-${note.perma}`" class="weui-media-box weui-media-box_appmsg">
+                          <!-- <div class="weui-media-box__hd"><p>📃</p></div> -->
+                          <div class="weui-media-box__bd">
+                            <h4 class="weui-media-box__title">备忘标题</h4>
+                            <p class="weui-media-box__desc">备忘描述……</p>
+                            <ul class="weui-media-box__info">
+                              <li class="weui-media-box__info__meta">文字来源</li>
+                              <li class="weui-media-box__info__meta">时间</li>
+                              <li class="weui-media-box__info__meta weui-media-box__info__meta_extra">其它信息</li>
+                            </ul>
+                          </div>
+                          <!-- <div class="weui-media-box__ft"><p>🖋</p></div> -->
                         </a>
+                      </div>
                     </div>
+                    <!-- <div class="weui-panel__ft">
+                      <a href="#" class="weui-cell weui-cell_active weui-cell_access weui-cell_link">
+                        <div class="weui-cell__bd">查看更多</div>
+                        <span class="weui-cell__ft"></span>
+                      </a>
+                    </div> -->
+                  </div>
+
                 </div>
-            </div>
-        </div>
-        <div class="weui-panel">
-            <div class="weui-panel__hd">文字列表附来源</div>
-            <div class="weui-panel__bd">
-                <div class="weui-media-box weui-media-box_text">
-                    <h4 class="weui-media-box__title">标题一</h4>
-                    <p class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</p>
-                    <ul class="weui-media-box__info">
-                        <li class="weui-media-box__info__meta">文字来源</li>
-                        <li class="weui-media-box__info__meta">时间</li>
-                        <li class="weui-media-box__info__meta weui-media-box__info__meta_extra">其它信息</li>
-                    </ul>
+
+                <div class="page__bd">
+                  <div class="weui-loadmore weui-loadmore_line">
+                    <span class="weui-loadmore__tips">暂无数据</span>
+                  </div>
+                  <div class="weui-loadmore weui-loadmore_line weui-loadmore_dot">
+                    <span class="weui-loadmore__tips"></span>
+                  </div>
+                  <div class="weui-loadmore">
+                    <span class="weui-primary-loading">
+                      <i class="weui-primary-loading__dot"></i>
+                    </span>
+                    <span class="weui-loadmore__tips">正在加载</span>
+                  </div>
                 </div>
+
+
+
+              </div>
             </div>
-        </div>
-    </div>
-
-
-
-
-
-
-
+          <!-- </div> -->
 
         </div>
+        <!-- tools -->
         <div class="weui-tab__panel" id="tools" key="tab_1" v-if="ui.tab_current==1">
-
-
-
           <div class="page__bd">
+
             <div class="weui-panel weui-panel_access">
               <div class="weui-panel__hd">网络内容抓取收藏</div>
               <div class="weui-panel__bd">
@@ -192,32 +175,66 @@
                     <p class="weui-media-box__desc">将微信公众号文章收藏到 LeanCloud 数据库。仅文字。</p>
                   </div>
                 </a>
-                <div class="weui-media-box weui-media-box_text">
-                  <h4 class="weui-media-box__title">知乎专栏收藏</h4>
-                  <p class="weui-media-box__desc">将知乎专栏文章收藏到 LeanCloud 数据库。敬请期待！</p>
-                </div>
-                <div class="weui-media-box weui-media-box_text">
-                  <h4 class="weui-media-box__title">自定义网站收藏</h4>
-                  <p class="weui-media-box__desc">将自定义网站文章收藏到 LeanCloud 数据库。敬请期待！</p>
-                </div>
+                <a href="#page-please" class="weui-media-box weui-media-box_appmsg">
+                  <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title">知乎专栏收藏</h4>
+                    <p class="weui-media-box__desc">将知乎专栏文章收藏到 LeanCloud 数据库。敬请期待！</p>
+                  </div>
+                </a>
+                <a href="#page-please" class="weui-media-box weui-media-box_appmsg">
+                  <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title">自定义网站收藏</h4>
+                    <p class="weui-media-box__desc">将自定义网站文章收藏到 LeanCloud 数据库。敬请期待！</p>
+                  </div>
+                </a>
+              </div>
+            </div>
+
+            <div class="weui-panel weui-panel_access">
+              <div class="weui-panel__hd">导入导出</div>
+              <div class="weui-panel__bd">
+                <a href="#page-please" class="weui-media-box weui-media-box_appmsg">
+                  <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title">导出为 Markdown</h4>
+                    <p class="weui-media-box__desc">将选中的笔记导出为一个 Markdown 文件。</p>
+                  </div>
+                </a>
+                <a href="#page-please" class="weui-media-box weui-media-box_appmsg">
+                  <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title">导出为 Json</h4>
+                    <p class="weui-media-box__desc">将选中的笔记导出为一个 Json 文件，可以再次导入。</p>
+                  </div>
+                </a>
+                <a href="#page-please" class="weui-media-box weui-media-box_appmsg">
+                  <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title">从 Json 导入</h4>
+                    <p class="weui-media-box__desc">从以前导出的 Json 文件中导入笔记。</p>
+                  </div>
+                </a>
               </div>
               <div class="weui-panel__ft">
-                <a href="#" class="weui-cell weui-cell_active weui-cell_access weui-cell_link">
+                <a href="#page-please" class="weui-cell weui-cell_active weui-cell_access weui-cell_link">
                     <div class="weui-cell__bd">查看更多</div>
                     <span class="weui-cell__ft"></span>
                 </a>
               </div>
             </div>
+
           </div>
-
-
-
         </div>
+
+
+        <!-- me -->
         <div class="weui-tab__panel" id="me" key="tab_2" v-if="ui.tab_current==2">
+          <div class="page__bd">
+            <div class="weui-cells__title">我</div>
+            <div class="weui-cells">
+              <div class="weui-cell weui-cell_active weui-cell_access">
+                <div class="weui-cell__bd">{{user.username}}</div>
+              </div>
+            </div>
 
 
-
-    <div class="page__bd">
 
       <!-- <div class="weui-cells__group weui-cells__group_form"> -->
         <div class="weui-cells__title">深色模式</div>
@@ -362,7 +379,44 @@
     <div class="weui-form__extra-area">
       <div class="weui-footer">
         <p class="weui-footer__links">
-          <a href="https://github.com" target="_blank" class="weui-footer__link">github</a>
+          <a href="#tools" class="weui-footer__link">返回</a>
+        </p>
+        <p class="weui-footer__text">L❤️C</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- please -->
+<div class="layer layer-upper pp _page _js_show" id="page-please" ref="page_please" key="page_please" v-if="pages[status.current_page]=='please'">
+  <div class="weui-form">
+    <div class="weui-form__text-area">
+      <h2 class="weui-form__title">敬请期待</h2>
+      <div class="weui-form__desc">该功能尚未实现，敬请期待！</div>
+    </div>
+    <div class="weui-form__control-area">
+      <div class="weui-cells__group weui-cells__group_form">
+        <div class="weui-cells__title">敬请期待</div>
+        <div class="weui-cells weui-cells_form">
+          <div class="weui-cell weui-cell_active">
+            <div class="weui-cell__hd"><label class="weui-label">不必填写</label></div>
+            <div class="weui-cell__bd">
+              <input id="js_input-please" class="weui-input" placeholder="敬请期待">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="weui-form__opr-area">
+      <button class="weui-btn weui-btn_primary" id="please-ok" v-on:click="go_hash('tools')">好的</button>
+    </div>
+    <div class="weui-form__tips-area">
+      <p class="weui-form__tips">^_^</p>
+    </div>
+    <div class="weui-form__extra-area">
+      <div class="weui-footer">
+        <p class="weui-footer__links">
+          <a href="#tools" class="weui-footer__link">返回</a>
         </p>
         <p class="weui-footer__text">L❤️C</p>
       </div>
@@ -483,6 +537,7 @@
 <!-- --- -->
 </div>
 <!-- --- -->
+<script src="https://cdn.bootcdn.net/ajax/libs/store.js/2.0.9/store.legacy.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/leancloud-storage@5.0.0-beta.0/dist/browser/lc.min.js"></script>
 <!-- <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script> -->
 <!-- <script src="https://cdn.bootcdn.net/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script> -->
