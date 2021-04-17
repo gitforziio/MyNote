@@ -20,6 +20,7 @@
   </style>
   <style type="text/css">
     .weui-toptips {display: block; background-color: var(--weui-BG-4);}
+    .weui-toptips_warn {display: block; background-color: var(--weui-RED);}
     .weui-tabbar__icon > * {line-height: 30px;}
   </style>
   <style type="text/css">
@@ -230,38 +231,56 @@
             <div class="weui-cells__title">我</div>
             <div class="weui-cells">
               <div class="weui-cell weui-cell_active weui-cell_access">
-                <div class="weui-cell__bd">{{user.username}}</div>
+                <div class="weui-cell__bd">{{status.username}}</div>
               </div>
             </div>
 
-
-
-      <!-- <div class="weui-cells__group weui-cells__group_form"> -->
-        <div class="weui-cells__title">深色模式</div>
-        <div class="weui-cells weui-cells_form">
-          <div class="weui-cell weui-cell_active weui-cell_switch">
-            <div class="weui-cell__bd">跟随系统</div>
-            <div class="weui-cell__ft">
-              <label for="switch_dark_mode_follow_system" class="weui-switch-cp">
-                <input id="switch_dark_mode_follow_system" class="weui-switch-cp__input" type="checkbox" v-model="settings.dark_mode_follow_system">
-                <div class="weui-switch-cp__box"></div>
-              </label>
+            <div class="weui-cells__title">深色模式</div>
+            <div class="weui-cells weui-cells_form">
+              <!-- <div class="weui-cells__group weui-cells__group_form"> -->
+                <div class="weui-cell weui-cell_active weui-cell_switch">
+                  <div class="weui-cell__bd">跟随系统</div>
+                  <div class="weui-cell__ft">
+                    <label for="switch_dark_mode_follow_system" class="weui-switch-cp">
+                      <input id="switch_dark_mode_follow_system" class="weui-switch-cp__input" type="checkbox" v-model="settings.dark_mode_follow_system">
+                      <div class="weui-switch-cp__box"></div>
+                    </label>
+                  </div>
+                </div>
+                <div class="weui-cell weui-cell_switch" v-if="!settings.dark_mode_follow_system" :class="{'weui-cell_active':!settings.dark_mode_follow_system}">
+                  <div class="weui-cell__bd">开启或关闭</div>
+                  <div class="weui-cell__ft">
+                    <label for="switch_dark" class="weui-switch-cp">
+                      <input id="switch_dark" class="weui-switch-cp__input" type="checkbox" v-model="settings.dark_mode" :disabled="settings.dark_mode_follow_system">
+                      <div class="weui-switch-cp__box"></div>
+                    </label>
+                  </div>
+                </div>
+              <!-- </div> -->
             </div>
-          </div>
-          <div class="weui-cell weui-cell_switch" v-if="!settings.dark_mode_follow_system" :class="{'weui-cell_active':!settings.dark_mode_follow_system}">
-            <div class="weui-cell__bd">开启或关闭</div>
-            <div class="weui-cell__ft">
-              <label for="switch_dark" class="weui-switch-cp">
-                <input id="switch_dark" class="weui-switch-cp__input" type="checkbox" v-model="settings.dark_mode" :disabled="settings.dark_mode_follow_system">
-                <div class="weui-switch-cp__box"></div>
-              </label>
+
+            <div class="weui-cells__title">MyNote</div>
+            <div class="weui-cells weui-cells_form">
+              <div class="weui-cell weui-cell_active weui-cell_access">
+                <div class="weui-cell__bd">
+                  <span class="demo_badge_title">文档</span>
+                  <!-- <span class="weui-badge">NEW</span> -->
+                </div>
+                <div class="weui-cell__ft"></div>
+              </div>
+              <div class="weui-cell weui-cell_active weui-cell_access">
+                <div class="weui-cell__bd">
+                  <span class="demo_badge_title">关于</span>
+                  <span class="weui-badge">NEW</span>
+                </div>
+                <div class="weui-cell__ft"></div>
+              </div>
+              <!-- <div class="weui-cells__group weui-cells__group_form"> -->
+              <!-- </div> -->
             </div>
-          </div>
-        </div>
-      <!-- </div> -->
 
 
-        <div class="weui-cells__title">新消息提示跟摘要信息后，统一在列表右侧</div>
+        <!-- <div class="weui-cells__title">新消息提示跟摘要信息后，统一在列表右侧</div>
         <div class="weui-cells">
             <div class="weui-cell weui-cell_active weui-cell_access">
                 <div class="weui-cell__bd">单行列表</div>
@@ -270,9 +289,9 @@
                     <span class="weui-badge weui-badge_dot"></span>
                 </div>
             </div>
-        </div>
+        </div> -->
 
-        <div class="weui-cells__title">未读数红点跟在主题信息后，统一在列表左侧</div>
+        <!-- <div class="weui-cells__title">未读数红点跟在主题信息后，统一在列表左侧</div>
         <div class="weui-cells demo_badge_cells">
             <div class="weui-cell weui-cell_active">
                 <div class="weui-cell__hd">
@@ -305,7 +324,8 @@
                 </div>
                 <div class="weui-cell__ft"></div>
             </div>
-        </div>
+        </div> -->
+
     </div>
 
     <div class="weui-form__tips-area">
@@ -337,7 +357,7 @@
 </div>
 
 <!-- add_post_gzh -->
-<div class="layer layer-upper pp _page _js_show" id="page-add_post_gzh" ref="page_login" key="page_add_post_gzh" v-if="pages[status.current_page]=='add_post_gzh'">
+<div class="layer layer-upper pp _page _js_show" id="page-add_post_gzh" ref="page_add_post_gzh" key="page_add_post_gzh" v-if="pages[status.current_page]=='add_post_gzh'">
   <div class="weui-form">
     <div class="weui-form__text-area">
       <h2 class="weui-form__title">公众号文章收藏</h2>
@@ -371,7 +391,7 @@
       <p class="weui-form__tips">热烈欢迎</p>
     </div> -->
     <div class="weui-form__opr-area" v-if="!tools_gzh.is_analyzed">
-      <button class="weui-btn weui-btn_primary" :class="{'weui-btn_disabled':!tools_gzh_check_url(), 'weui-btn_loading':tools_gzh.is_analyzing}" href="#" id="login" :disabled="!tools_gzh_check_url()" v-on:click="tools_gzh_analyze"><span v-if="tools_gzh.is_analyzing" class="weui-primary-loading weui-primary-loading_transparent"><i class="weui-primary-loading__dot"></i></span>分析</button>
+      <button class="weui-btn weui-btn_primary" :class="{'weui-btn_disabled':!tools_gzh_check_url(), 'weui-btn_loading':tools_gzh.is_analyzing}" href="#" id="tools_gzh_analyze" :disabled="!tools_gzh_check_url()" v-on:click="tools_gzh_analyze"><span v-if="tools_gzh.is_analyzing" class="weui-primary-loading weui-primary-loading_transparent"><i class="weui-primary-loading__dot"></i></span>分析</button>
     </div>
     <div class="weui-form__tips-area">
       <p class="weui-form__tips">^_^</p>
@@ -436,6 +456,12 @@
         <div class="weui-cells__title">LeanCloud</div>
         <div class="weui-cells weui-cells_form">
           <div class="weui-cell weui-cell_active">
+            <div class="weui-cell__hd"><label class="weui-label">Keys</label></div>
+            <div class="weui-cell__bd">
+              <input id="js_input-lc-keys" class="weui-input" placeholder="LeanCloud Keys String" v-model="lean_cloud_keys_str">
+            </div>
+          </div>
+          <!-- <div class="weui-cell weui-cell_active">
             <div class="weui-cell__hd"><label class="weui-label">appId</label></div>
             <div class="weui-cell__bd">
               <input id="js_input-lc-appid" class="weui-input" placeholder="LeanCloud appId" v-model="lean_cloud_keys.appId">
@@ -452,7 +478,7 @@
             <div class="weui-cell__bd">
               <input id="js_input-lc-sever-url" class="weui-input" placeholder="LeanCloud serverURL" v-model="lean_cloud_keys.serverURL" __pattern="[0-9]*">
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
       <div class="weui-cells__group weui-cells__group_form">
@@ -476,10 +502,19 @@
         <div class="weui-cells__title">设置</div>
         <div class="weui-cells weui-cells_form">
           <div class="weui-cell weui-cell_active weui-cell_switch">
+            <div class="weui-cell__bd">记住 Keys</div>
+            <div class="weui-cell__ft">
+              <label for="switch_remember_keys" class="weui-switch-cp">
+                <input id="switch_remember_keys" class="weui-switch-cp__input" type="checkbox" v-model="settings.remember_keys">
+                <div class="weui-switch-cp__box"></div>
+              </label>
+            </div>
+          </div>
+          <div class="weui-cell weui-cell_active weui-cell_switch">
             <div class="weui-cell__bd">记住用户名</div>
             <div class="weui-cell__ft">
-              <label for="switchCP" class="weui-switch-cp">
-                <input id="switchCP" class="weui-switch-cp__input" type="checkbox" v-model="settings.remember_user">
+              <label for="switch_remember_user" class="weui-switch-cp">
+                <input id="switch_remember_user" class="weui-switch-cp__input" type="checkbox" v-model="settings.remember_user">
                 <div class="weui-switch-cp__box"></div>
               </label>
             </div>
@@ -491,7 +526,7 @@
       <p class="weui-form__tips">热烈欢迎</p>
     </div>
     <div class="weui-form__opr-area">
-      <button class="weui-btn weui-btn_primary" :class="{'weui-btn_disabled':(user.username==''||user.password==''||lean_cloud_keys.appId==''||lean_cloud_keys.appKey==''||lean_cloud_keys.serverURL==''), 'weui-btn_loading':status.loginning}" href="#" id="login" :disabled="(user.username==''||user.password==''||lean_cloud_keys.appId==''||lean_cloud_keys.appKey==''||lean_cloud_keys.serverURL=='')" v-on:click="login"><span v-if="status.loginning" class="weui-primary-loading weui-primary-loading_transparent"><i class="weui-primary-loading__dot"></i></span>登录</button>
+      <button class="weui-btn weui-btn_primary" :class="{'weui-btn_disabled':(user.username==''||user.password==''||lean_cloud_keys_str==''), 'weui-btn_loading':status.loginning}" href="#" id="login" :disabled="(user.username==''||user.password==''||lean_cloud_keys_str=='')" v-on:click="login"><span v-if="status.loginning" class="weui-primary-loading weui-primary-loading_transparent"><i class="weui-primary-loading__dot"></i></span>登录</button>
     </div>
     <div class="weui-form__tips-area">
       <p class="weui-form__tips">^_^</p>
@@ -528,7 +563,7 @@
 
 <!-- toptips -->
 <div class="layer" id="wrap-toptips" ref="wrap_toptips"><transition name="fade_toptip" v-for="toptip in ui.toptips">
-  <div v-if="toptip.show" class="weui-toptips" :class="{'weui-toptips_warn': true||toptip.type=='warn'}">{{toptip.content}}</div>
+  <div v-if="toptip.show" class="weui-toptips" :class="{'weui-toptips_warn': toptip.type=='warn'}">{{toptip.content}}</div>
 </transition></div>
 
 

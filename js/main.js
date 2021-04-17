@@ -6,9 +6,10 @@ var the_vue = new Vue({
     el: '#app',
     data: {
         "app_name": "MyNote",
-        "fields": ["lean_cloud_keys", "user", "settings", "status", "ui"],
+        "fields": ["lean_cloud_keys_str", "user", "settings", "status", "ui"],
         //
         "hash": "",
+        "lean_cloud_keys_str": "",
         "lean_cloud_keys": {
             appId: "",
             appKey: "",
@@ -22,6 +23,7 @@ var the_vue = new Vue({
         "notes": [],
         //
         "status": {
+            username: "",
             lc_initiated: false,
             logged_in: false,
             current_page: 0,
@@ -30,6 +32,7 @@ var the_vue = new Vue({
         },
         "ready": false,
         "settings": {
+            remember_keys: true,
             remember_user: true,
             dark_mode: false,
             dark_mode_follow_system: true,
@@ -121,6 +124,9 @@ var the_vue = new Vue({
                 'me': function() {
                     self.go_tab(2);
                 },
+                'page-login': function() {
+                    self.status.current_page =0;
+                },
                 "page-add_post_gzh": function() {
                     self.tools_gzh= {
                         url: "",
@@ -136,10 +142,14 @@ var the_vue = new Vue({
                     self.status.current_page = 5;
                 },
             };
-            if (hash in _map) {
-                _map[hash]();
+            if (self.status.logged_in) {
+                if (hash in _map) {
+                    _map[hash]();
+                } else {
+                    self.go_hash(`notes`);
+                };
             } else {
-                self.go_hash(`notes`);
+                _map['page-login']();
             };
         },
 
@@ -148,37 +158,61 @@ var the_vue = new Vue({
             self.status.loginning = true;
             if (!self.status.lc_initiated) {
                 try {
+                    let ll = self.lean_cloud_keys_str.trim().split(" ");
+                    if (ll.length != 3) {
+                        self.status.loginning = false;
+                        self.push_toast('danger', `LeanCloud字符串可能不正确`, 2000);
+                        return null;
+                    };
+                    self.lean_cloud_keys = {
+                        appId: ll[0],
+                        appKey: ll[1],
+                        serverURL: ll[2],
+                    };
+                } catch(error) {
+                    self.status.loginning = false;
+                    self.push_toast('danger', `LeanCloud字符串分析出错`, 2000);
+                    return null;
+                };
+                try {
                     LC.init(self.lean_cloud_keys);
                     self.status.lc_initiated = true;
                 } catch(error) {
-                    self.push_toast('success', `LeanCloud已初始化`, 2000);
+                    self.status.loginning = false;
+                    self.push_toast('info', `${error}`, 2000);
                 };
-            }
+            };
             LC.User.login(self.user.username, self.user.password)
             .then((x) => {
+                self.status.username = self.user.username;
                 self.status.loginning = false;
                 self.push_toast('success', `你好，${LC.User.current().data.username}，登录成功啦！`, 1000);
-                // self.status.logged_in = true;
+                self.status.logged_in = true;
                 self.user.password = '';
                 self.user.username = self.settings.remember_user ? self.user.username : '';
+                self.lean_cloud_keys_str = self.settings.remember_keys ? self.lean_cloud_keys_str : '';
                 self.go_hash('notes');
                 // self.refresh();
             }).catch(({ error }) => {
+                self.status.username = "";
                 self.status.loginning = false;
                 self.push_toptip('danger', error, 3000);
                 self.user.password = '';
                 self.user.username = self.settings.remember_user ? self.user.username : '';
+                self.lean_cloud_keys_str = self.settings.remember_keys ? self.lean_cloud_keys_str : '';
             });
         },
 
         logOut: function() {
             let self = this;
-            self.push_toast('text', `再见${LC.User.current().data.username}！`);
             LC.User.logOut();
+            self.push_toast('text', `再见${self.status.username}！`);
+            self.status.username = "";
             self.user.password = "";
-            self.status.current_page = 0;
-            // self.status.logged_in = false;
+            self.status.logged_in = false;
+            self.go_hash("page-login");
             // self.refresh();
+            location.reload();
         },
 
         tools_gzh_check_url() {
@@ -429,19 +463,13 @@ var the_vue = new Vue({
     created() {
         let self = this;
         self.readDataFromLocalStorage();
-        if (self.lean_cloud_keys.appId&&self.lean_cloud_keys.appKey&&self.lean_cloud_keys.serverURL) {
-            try {
-                LC.init(self.lean_cloud_keys);
-                self.status.lc_initiated = true;
-                // self.push_toptip('success', `LeanCloud已自动初始化`, 2000);
-            } catch(error) {
-                self.push_toptip('warn', `LeanCloud自动初始化出现问题`, 2000);
-            };
+        //
+        if (self.settings.dark_mode_follow_system) {
+            document.querySelector('body').removeAttribute('data-weui-theme');
+        } else {
+            document.querySelector('body').setAttribute('data-weui-theme', self.settings.dark_mode?'dark':'light');
         };
-        if (self.status.loginning) {
-            self.status.loginning = false;
-        };
-        if (self.status.lc_initiated) {self.status.logged_in = LC.User.current() ? true : false;};
+        //
         if( ("onhashchange" in window) && ((typeof document.documentMode==="undefined") || document.documentMode==8)) {
             window.onhashchange = function() {
                 // self.push_toptip('warn', `浏览器能够监听 hash 变化`, 2000);
@@ -453,20 +481,60 @@ var the_vue = new Vue({
                 self.hash = location.hash;
             }, 150);
         };
+        //
+        //
+        self.ui.toptips = [];
+        self.ui.toasts = [];
+        self.status.lc_initiated = false;
+        self.status.loginning = false;
         if (self.status.logged_in) {
-            self.push_toast('success', `你好，${LC.User.current().data.username}，欢迎回来！`, 1000);
+            if (self.lean_cloud_keys_str) {
+                self.lean_cloud_keys = {
+                    appId: "",
+                    appKey: "",
+                    serverURL: "",
+                };
+                let ll = self.lean_cloud_keys_str.trim().split(" ");
+                if (ll.length != 3) {
+                    self.push_toast('danger', `缓存中的LeanCloud字符串可能不正确`, 2000);
+                } else {
+                    try {
+                        self.lean_cloud_keys = {
+                            appId: ll[0],
+                            appKey: ll[1],
+                            serverURL: ll[2],
+                        };
+                    } catch(error) {
+                        self.push_toptip('warn', `缓存中的LeanCloud字符串有问题`, 2000);
+                    };
+                };
+            };
+            if (self.lean_cloud_keys.appId&&self.lean_cloud_keys.appKey&&self.lean_cloud_keys.serverURL) {
+                try {
+                    LC.init(self.lean_cloud_keys);
+                    self.status.lc_initiated = true;
+                    // self.push_toptip('success', `LeanCloud已自动初始化`, 2000);
+                } catch(error) {
+                    self.push_toptip('warn', `LeanCloud自动初始化出现问题`, 2000);
+                };
+            };
+        } else {
+            self.push_toptip('info', `请登录`, 2000);
+        };
+        self.status.loginning = false;
+        if (self.status.lc_initiated) {self.status.logged_in = LC.User.current() ? true : false;};
+        if (self.status.logged_in) {
+            self.push_toast('success', `你好，${self.status.username}，欢迎回来！`, 1000);
             if (location.hash=="") {
                 console.log(`self.hash==""`);
                 self.go_hash("notes");
             } else if (location.hash!="#"&&location.hash[0]=="#") {
                 self.go_hash(location.hash.slice(1,location.hash.length));
             };
-        };
-        if (self.settings.dark_mode_follow_system) {
-            document.querySelector('body').removeAttribute('data-weui-theme');
         } else {
-            document.querySelector('body').setAttribute('data-weui-theme', self.settings.dark_mode?'dark':'light');
+            self.go_hash("page-login");
         };
+        //
         self.ready = true;
     },
     updated() {
