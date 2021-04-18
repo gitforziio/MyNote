@@ -31,6 +31,7 @@ var the_vue = new Vue({
             loginning: false,
         },
         "ready": false,
+        "store_enabled": true,
         "settings": {
             remember_keys: true,
             remember_user: true,
@@ -186,7 +187,7 @@ var the_vue = new Vue({
                     self.go_tab(2);
                 },
                 'page-login': function() {
-                    self.status.current_page =0;
+                    self.status.current_page = 0;
                 },
                 "page-add_post_gzh": function() {
                     self.tools_gzh= {
@@ -547,7 +548,23 @@ var the_vue = new Vue({
     created() {
         try {
             let self = this;
-            self.readDataFromLocalStorage();
+            if (store.enabled) {
+                self.store_enabled = true;
+                self.readDataFromLocalStorage();
+                self.ui.toptips_last_idx = 1;
+                self.ui.toptips = [];
+                self.ui.toasts_last_idx = 1;
+                self.ui.toasts = [];
+                self.push_toast('info', `【测试】`, 10000);
+            } else {
+                self.store_enabled = false;
+                self.ui.toptips_last_idx = 1;
+                self.ui.toptips = [];
+                self.ui.toasts_last_idx = 1;
+                self.ui.toasts = [];
+                self.push_toast('info', `【测试】`, 10000);
+                self.push_toptip('warn', `您的浏览器不支持存储功能，请关闭隐私模式，或使用更加现代的浏览器！`, 10000);
+            };
             self.ready = false;
             //
             if (self.settings.dark_mode_follow_system) {
@@ -569,8 +586,6 @@ var the_vue = new Vue({
             };
             //
             //
-            self.ui.toptips = [];
-            self.ui.toasts = [];
             self.status.lc_initiated = false;
             self.status.loginning = false;
             if (self.status.logged_in) {
