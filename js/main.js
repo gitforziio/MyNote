@@ -142,6 +142,7 @@ var the_vue = new Vue({
                     self.editor.objectId = x.objectId;
                     self.notes = self.notes.filter(y=>y.objectId!=x.objectId);
                     self.notes.push(x);
+                    self.notes.sort((a,b)=>{return b.updatedAt - a.updatedAt});
                     self.go_hash("notes");
                 })
                 .catch(({ error }) => self.push_toptip('warn', error));
@@ -219,6 +220,7 @@ var the_vue = new Vue({
                         xxx.objectId = xx.objectId;
                         xxx.createdAt = xx.createdAt;
                         xxx.updatedAt = xx.updatedAt;
+                        self.editor = xxx;
                     } else {
                         self.editor.objectId = "";
                     };
