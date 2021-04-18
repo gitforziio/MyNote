@@ -135,7 +135,7 @@ var the_vue = new Vue({
                 let that = Note.object(self.editor.objectId);
                 return that.update(note)
                 .then((x)=>{
-                    self.push_toptip('success', `成功更新笔记「${x.objectId}」`);
+                    self.push_toptip('success', `成功更新笔记「${x.objectId}」`, 500);
                     return Note.object(x.objectId).get();
                 })
                 .then((x)=>{
@@ -149,7 +149,7 @@ var the_vue = new Vue({
             } else {
                 return Note.add(note)
                 .then((x)=>{
-                    self.push_toptip('success', `成功创建笔记「${x.objectId}」`);
+                    self.push_toptip('success', `成功创建笔记「${x.objectId}」`, 500);
                     return Note.object(x.objectId).get();
                 })
                 .then((x)=>{
@@ -545,82 +545,86 @@ var the_vue = new Vue({
         let self = this;
     },
     created() {
-        let self = this;
-        self.readDataFromLocalStorage();
-        //
-        if (self.settings.dark_mode_follow_system) {
-            document.querySelector('body').removeAttribute('data-weui-theme');
-        } else {
-            document.querySelector('body').setAttribute('data-weui-theme', self.settings.dark_mode?'dark':'light');
-        };
-        //
-        if( ("onhashchange" in window) && ((typeof document.documentMode==="undefined") || document.documentMode==8)) {
-            window.onhashchange = function() {
-                // self.push_toptip('warn', `浏览器能够监听 hash 变化`, 2000);
-                self.hash = location.hash;
+        try {
+            let self = this;
+            self.readDataFromLocalStorage();
+            //
+            if (self.settings.dark_mode_follow_system) {
+                document.querySelector('body').removeAttribute('data-weui-theme');
+            } else {
+                document.querySelector('body').setAttribute('data-weui-theme', self.settings.dark_mode?'dark':'light');
             };
-        } else {
-            setInterval(function() {
-                // self.push_toptip('warn', `启用了定时检查 hash 的任务`, 2000);
-                self.hash = location.hash;
-            }, 150);
-        };
-        //
-        //
-        self.ui.toptips = [];
-        self.ui.toasts = [];
-        self.status.lc_initiated = false;
-        self.status.loginning = false;
-        if (self.status.logged_in) {
-            if (self.lean_cloud_keys_str) {
-                self.lean_cloud_keys = {
-                    appId: "",
-                    appKey: "",
-                    serverURL: "",
+            //
+            if( ("onhashchange" in window) && ((typeof document.documentMode==="undefined") || document.documentMode==8)) {
+                window.onhashchange = function() {
+                    // self.push_toptip('warn', `浏览器能够监听 hash 变化`, 2000);
+                    self.hash = location.hash;
                 };
-                let ll = self.lean_cloud_keys_str.trim().split(" ");
-                if (ll.length != 3) {
-                    self.push_toast('danger', `缓存中的LeanCloud字符串可能不正确`, 2000);
-                } else {
-                    try {
-                        self.lean_cloud_keys = {
-                            appId: ll[0],
-                            appKey: ll[1],
-                            serverURL: ll[2],
+            } else {
+                setInterval(function() {
+                    // self.push_toptip('warn', `启用了定时检查 hash 的任务`, 2000);
+                    self.hash = location.hash;
+                }, 150);
+            };
+            //
+            //
+            self.ui.toptips = [];
+            self.ui.toasts = [];
+            self.status.lc_initiated = false;
+            self.status.loginning = false;
+            if (self.status.logged_in) {
+                if (self.lean_cloud_keys_str) {
+                    self.lean_cloud_keys = {
+                        appId: "",
+                        appKey: "",
+                        serverURL: "",
+                    };
+                    let ll = self.lean_cloud_keys_str.trim().split(" ");
+                    if (ll.length != 3) {
+                        self.push_toast('danger', `缓存中的LeanCloud字符串可能不正确`, 2000);
+                    } else {
+                        try {
+                            self.lean_cloud_keys = {
+                                appId: ll[0],
+                                appKey: ll[1],
+                                serverURL: ll[2],
+                            };
+                        } catch(error) {
+                            self.push_toptip('warn', `缓存中的LeanCloud字符串有问题`, 2000);
                         };
-                    } catch(error) {
-                        self.push_toptip('warn', `缓存中的LeanCloud字符串有问题`, 2000);
                     };
                 };
-            };
-            if (self.lean_cloud_keys.appId&&self.lean_cloud_keys.appKey&&self.lean_cloud_keys.serverURL) {
-                try {
-                    LC.init(self.lean_cloud_keys);
-                    self.status.lc_initiated = true;
-                    // self.push_toptip('success', `LeanCloud已自动初始化`, 2000);
-                } catch(error) {
-                    self.push_toptip('warn', `LeanCloud自动初始化出现问题`, 2000);
+                if (self.lean_cloud_keys.appId&&self.lean_cloud_keys.appKey&&self.lean_cloud_keys.serverURL) {
+                    try {
+                        LC.init(self.lean_cloud_keys);
+                        self.status.lc_initiated = true;
+                        // self.push_toptip('success', `LeanCloud已自动初始化`, 2000);
+                    } catch(error) {
+                        self.push_toptip('warn', `LeanCloud自动初始化出现问题`, 2000);
+                    };
                 };
+            } else {
+                self.push_toptip('info', `请登录`, 500);
             };
-        } else {
-            self.push_toptip('info', `请登录`, 2000);
-        };
-        self.status.loginning = false;
-        if (self.status.lc_initiated) {self.status.logged_in = LC.User.current() ? true : false;};
-        if (self.status.logged_in) {
-            self.push_toast('success', `你好，${self.status.username}，欢迎回来！`, 1000);
-            self.sync();
-            if (location.hash=="") {
-                console.log(`self.hash==""`);
-                self.go_hash("notes");
-            } else if (location.hash!="#"&&location.hash[0]=="#") {
-                self.go_hash(location.hash.slice(1,location.hash.length));
+            self.status.loginning = false;
+            if (self.status.lc_initiated) {self.status.logged_in = LC.User.current() ? true : false;};
+            if (self.status.logged_in) {
+                self.push_toast('success', `你好，${self.status.username}，欢迎回来！`, 1000);
+                self.sync();
+                if (location.hash=="") {
+                    console.log(`self.hash==""`);
+                    self.go_hash("notes");
+                } else if (location.hash!="#"&&location.hash[0]=="#") {
+                    self.go_hash(location.hash.slice(1,location.hash.length));
+                };
+            } else {
+                self.go_hash("page-login");
             };
-        } else {
-            self.go_hash("page-login");
+            //
+            self.ready = true;
+        } catch(error) {
+            self.push_toptip('warn', `${error}`, 5000);
         };
-        //
-        self.ready = true;
     },
     updated() {
         let self = this;
