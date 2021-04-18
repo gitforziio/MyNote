@@ -546,66 +546,66 @@ var the_vue = new Vue({
         let self = this;
     },
     created() {
-        alert("created");
+        // alert("created");
         try {
-            alert("try");
+            // alert("try");
             let self = this;
             if (store.enabled) {
-                alert("store.enabled");
+                // alert("store.enabled");
                 self.store_enabled = true;
                 self.readDataFromLocalStorage();
-                alert("readDataFromLocalStorage");
+                // alert("readDataFromLocalStorage");
                 self.ui.toptips_last_idx = 1;
                 self.ui.toptips = [];
                 self.ui.toasts_last_idx = 1;
                 self.ui.toasts = [];
-                alert("before push_toast");
+                // alert("before push_toast");
                 self.push_toast('info', `【测试】`, 10000);
-                alert("after push_toast");
+                // alert("after push_toast");
             } else {
-                alert("store.enabled == false");
+                // alert("store.enabled == false");
                 self.store_enabled = false;
                 self.ui.toptips_last_idx = 1;
                 self.ui.toptips = [];
                 self.ui.toasts_last_idx = 1;
                 self.ui.toasts = [];
-                alert("before push_toast");
+                // alert("before push_toast");
                 self.push_toast('info', `【测试】`, 10000);
                 self.push_toptip('warn', `您的浏览器不支持存储功能，请关闭隐私模式，或使用更加现代的浏览器！`, 10000);
-                alert("after push_toast");
+                // alert("after push_toast");
             };
             self.ready = false;
-            alert("self.ready = false");
+            // alert("self.ready = false");
             //
             if (self.settings.dark_mode_follow_system) {
-                alert("dark_mode_follow_system");
+                // alert("dark_mode_follow_system");
                 document.querySelector('body').removeAttribute('data-weui-theme');
             } else {
-                alert("dark_mode_follow_system false");
+                // alert("dark_mode_follow_system false");
                 document.querySelector('body').setAttribute('data-weui-theme', self.settings.dark_mode?'dark':'light');
             };
             //
             if( ("onhashchange" in window) && ((typeof document.documentMode==="undefined") || document.documentMode==8)) {
-                alert("onhashchange");
+                // alert("onhashchange");
                 window.onhashchange = function() {
                     // self.push_toptip('warn', `浏览器能够监听 hash 变化`, 2000);
                     self.hash = location.hash;
                 };
-                alert("onhashchange done");
+                // alert("onhashchange done");
             } else {
-                alert("setInterval");
+                // alert("setInterval");
                 setInterval(function() {
                     // self.push_toptip('warn', `启用了定时检查 hash 的任务`, 2000);
                     self.hash = location.hash;
                 }, 150);
-                alert("setInterval done");
+                // alert("setInterval done");
             };
             //
             //
             self.status.lc_initiated = false;
             self.status.loginning = false;
             if (self.status.logged_in) {
-                alert("应该登录了吧");
+                // alert("应该登录了吧");
                 if (self.lean_cloud_keys_str) {
                     self.lean_cloud_keys = {
                         appId: "",
@@ -637,22 +637,34 @@ var the_vue = new Vue({
                     };
                 };
             } else {
-                alert("请登录");
+                // alert("请登录");
                 self.push_toptip('info', `请登录`, 500);
+                alert("请登录 done");
             };
             self.status.loginning = false;
-            if (self.status.lc_initiated) {self.status.logged_in = LC.User.current() ? true : false;};
+            if (self.status.lc_initiated) {
+                alert("lc_initiated");
+                self.status.logged_in = LC.User.current() ? true : false;
+            };
             if (self.status.logged_in) {
+                alert("logged_in");
                 self.push_toast('success', `你好，${self.status.username}，欢迎回来！`, 1000);
                 self.sync();
+                alert("sync done");
                 if (location.hash=="") {
                     console.log(`self.hash==""`);
+                    alert("go_hash(‘notes’)");
                     self.go_hash("notes");
+                    alert("go_hash(‘notes’) done");
                 } else if (location.hash!="#"&&location.hash[0]=="#") {
+                    alert(`go_hash(‘${location.hash.slice(1,location.hash.length)}’)`);
                     self.go_hash(location.hash.slice(1,location.hash.length));
+                    alert(`go_hash(‘${location.hash.slice(1,location.hash.length)}’) done`);
                 };
             } else {
+                alert("go_hash(‘page-login’)");
                 self.go_hash("page-login");
+                alert("go_hash(‘page-login’) done");
             };
             //
             self.ready = true;
