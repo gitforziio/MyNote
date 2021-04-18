@@ -548,6 +548,7 @@ var the_vue = new Vue({
         try {
             let self = this;
             self.readDataFromLocalStorage();
+            self.ready = false;
             //
             if (self.settings.dark_mode_follow_system) {
                 document.querySelector('body').removeAttribute('data-weui-theme');
