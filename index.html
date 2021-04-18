@@ -62,7 +62,31 @@
 <!-- --- -->
 
 
-<div class="welcome_cover" v-if="!ready"></div>
+<div class="welcome_cover" v-if="!ready">
+  <div class="weui-form">
+    <div class="weui-form__text-area">
+      <h2 class="weui-form__title">MyNote</h2>
+      <div class="weui-form__desc">我的专属备忘录</div>
+    </div>
+    <div class="weui-form__tips-area">
+      <p class="weui-form__tips">happy everyday</p>
+    </div>
+    <div class="weui-form__opr-area">
+      <button class="weui-btn weui-btn_primary" href="#" id="loading-btn" disabled="disabled"><span class="weui-primary-loading weui-primary-loading_transparent"><i class="weui-primary-loading__dot"></i></span></button>
+    </div>
+    <div class="weui-form__tips-area">
+      <p class="weui-form__tips">^_^</p>
+    </div>
+    <div class="weui-form__extra-area">
+      <div class="weui-footer">
+        <p class="weui-footer__links">
+          <a href="https://github.com/gitforziio/MyNote" target="_blank" class="weui-footer__link">github</a>
+        </p>
+        <p class="weui-footer__text">L❤️C</p>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 <transition name="page_anim" _mode="out-in" mode="in-out">
@@ -571,7 +595,7 @@
     <div class="weui-form__extra-area">
       <div class="weui-footer">
         <p class="weui-footer__links">
-          <a href="https://github.com" target="_blank" class="weui-footer__link">github</a>
+          <a href="https://github.com/gitforziio/MyNote" target="_blank" class="weui-footer__link">github</a>
         </p>
         <p class="weui-footer__text">L❤️C</p>
       </div>
