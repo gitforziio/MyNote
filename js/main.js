@@ -155,6 +155,7 @@ var the_vue = new Vue({
                 .then((x)=>{
                     self.editor.objectId = x.objectId;
                     self.notes.push(x);
+                    self.notes.sort((a,b)=>{return b.updatedAt - a.updatedAt});
                     self.go_hash("notes");
                 })
                 .catch(({ error }) => self.push_toptip('warn', error));
@@ -203,6 +204,8 @@ var the_vue = new Vue({
                 },
                 'page-edit': function() {
                     self.editor.objectId = "";
+                    self.editor.contentOld = self.editor.content;
+                    self.editor.content = "";
                     self.status.current_page = 6;
                 },
             };
