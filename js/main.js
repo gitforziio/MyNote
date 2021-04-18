@@ -188,6 +188,7 @@ var the_vue = new Vue({
                 },
                 'page-login': function() {
                     self.status.current_page = 0;
+                    alert("go_hash(‘page-login’) done");
                 },
                 "page-add_post_gzh": function() {
                     self.tools_gzh= {
@@ -639,37 +640,38 @@ var the_vue = new Vue({
             } else {
                 // alert("请登录");
                 self.push_toptip('info', `请登录`, 500);
-                alert("请登录 done");
+                // alert("请登录 done");
             };
             self.status.loginning = false;
             if (self.status.lc_initiated) {
-                alert("lc_initiated");
+                // alert("lc_initiated");
                 self.status.logged_in = LC.User.current() ? true : false;
             };
             if (self.status.logged_in) {
-                alert("logged_in");
+                // alert("logged_in");
                 self.push_toast('success', `你好，${self.status.username}，欢迎回来！`, 1000);
                 self.sync();
-                alert("sync done");
+                // alert("sync done");
                 if (location.hash=="") {
                     console.log(`self.hash==""`);
-                    alert("go_hash(‘notes’)");
+                    // alert("go_hash(‘notes’)");
                     self.go_hash("notes");
-                    alert("go_hash(‘notes’) done");
+                    // alert("go_hash(‘notes’) done");
                 } else if (location.hash!="#"&&location.hash[0]=="#") {
-                    alert(`go_hash(‘${location.hash.slice(1,location.hash.length)}’)`);
+                    // alert(`go_hash(‘${location.hash.slice(1,location.hash.length)}’)`);
                     self.go_hash(location.hash.slice(1,location.hash.length));
-                    alert(`go_hash(‘${location.hash.slice(1,location.hash.length)}’) done`);
+                    // alert(`go_hash(‘${location.hash.slice(1,location.hash.length)}’) done`);
                 };
             } else {
-                alert("go_hash(‘page-login’)");
+                alert("😄");
                 self.go_hash("page-login");
-                alert("go_hash(‘page-login’) done");
             };
             //
             self.ready = true;
+            alert("ready");
             self.push_toast('info', `……`);
         } catch(error) {
+            alert(`${error}`);
             self.push_toptip('warn', `${error}`, 5000);
         };
     },
