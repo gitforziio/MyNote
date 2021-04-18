@@ -264,6 +264,7 @@ var the_vue = new Vue({
             .then((x) => {
                 self.status.username = self.user.username;
                 self.status.loginning = false;
+                self.sync();
                 self.push_toast('success', `你好，${LC.User.current().data.username}，登录成功啦！`, 1000);
                 self.status.logged_in = true;
                 self.user.password = '';
