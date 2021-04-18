@@ -622,6 +622,7 @@ var the_vue = new Vue({
             };
             //
             self.ready = true;
+            self.push_toast('info', `……`);
         } catch(error) {
             self.push_toptip('warn', `${error}`, 5000);
         };
