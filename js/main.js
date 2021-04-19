@@ -1,3 +1,5 @@
+var vConsole = new VConsole();
+
 function get_title(text) {
     return text.trimLeft().split("\n")[0].slice(0,36)
 }
