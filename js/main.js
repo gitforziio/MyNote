@@ -217,6 +217,7 @@ var the_vue = new Vue({
             if (self.status.logged_in) {
                 if (hash in _map) {
                     _map[hash]();
+                    location.hash = hash;
                 } else if (hash.slice(0,4)=="post") {
                     let noteID = hash.slice(5, hash.length);
                     self.push_toptip('info', `${noteID}`);
@@ -233,11 +234,14 @@ var the_vue = new Vue({
                         self.editor.objectId = "";
                     };
                     self.status.current_page = 6;
+                    location.hash = hash;
                 } else {
                     self.go_hash(`notes`);
+                    location.hash = `notes`;
                 };
             } else {
                 _map['page-login']();
+                location.hash = `page-login`;
             };
         },
 
@@ -674,7 +678,7 @@ var the_vue = new Vue({
             // alert(`${self.status.current_page},${self.status.current_tab},${location}`);
             self.push_toast('info', `……`);
         } catch(error) {
-            // alert(`${error}`);
+            alert(`${error}`);
             self.push_toptip('warn', `${error}`, 5000);
         };
     },
