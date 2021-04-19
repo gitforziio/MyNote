@@ -553,11 +553,11 @@ var the_vue = new Vue({
     beforeCreate() {
         let self = this;
     },
-    created() {
+    mounted() {
+        let self = this;
         // alert("created");
         try {
             // alert("try");
-            let self = this;
             if (store.enabled) {
                 // alert("store.enabled");
                 self.store_enabled = true;
