@@ -188,7 +188,8 @@ var the_vue = new Vue({
                 },
                 'page-login': function() {
                     self.status.current_page = 0;
-                    alert(`${self.status.current_page}`);
+                    alert(`这里是${self.status.current_page}`);
+                    setTimeout(()=>{alert(`现在这里是${self.status.current_page}`);}, 2000);
                 },
                 "page-add_post_gzh": function() {
                     self.tools_gzh= {
@@ -668,10 +669,10 @@ var the_vue = new Vue({
             };
             //
             self.ready = true;
-            alert(`${self.status.current_page},${self.status.current_tab},${location}`);
+            // alert(`${self.status.current_page},${self.status.current_tab},${location}`);
             self.push_toast('info', `……`);
         } catch(error) {
-            alert(`${error}`);
+            // alert(`${error}`);
             self.push_toptip('warn', `${error}`, 5000);
         };
     },
