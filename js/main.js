@@ -190,8 +190,8 @@ var the_vue = new Vue({
                 },
                 'page-login': function() {
                     self.status.current_page = 0;
-                    alert(`这里是${self.status.current_page}`);
-                    setTimeout(()=>{alert(`现在这里是${self.status.current_page}`);}, 2000);
+                    // alert(`这里是${self.status.current_page}`);
+                    // setTimeout(()=>{alert(`现在这里是${self.status.current_page}`);}, 2000);
                 },
                 "page-add_post_gzh": function() {
                     self.tools_gzh= {
@@ -555,7 +555,7 @@ var the_vue = new Vue({
     },
     mounted() {
         let self = this;
-        alert("mounted");
+        // alert("mounted");
         try {
             // alert("try");
             if (store.enabled) {
