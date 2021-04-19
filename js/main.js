@@ -568,7 +568,7 @@ var the_vue = new Vue({
                 self.ui.toasts_last_idx = 1;
                 self.ui.toasts = [];
                 // alert("before push_toast");
-                self.push_toast('info', `【测试】`, 10000);
+                // self.push_toast('info', `【测试】`, 10000);
                 // alert("after push_toast");
             } else {
                 // alert("store.enabled == false");
@@ -578,7 +578,7 @@ var the_vue = new Vue({
                 self.ui.toasts_last_idx = 1;
                 self.ui.toasts = [];
                 // alert("before push_toast");
-                self.push_toast('info', `【测试】`, 10000);
+                // self.push_toast('info', `【测试】`, 10000);
                 self.push_toptip('warn', `您的浏览器不支持存储功能，请关闭隐私模式，或使用更加现代的浏览器！`, 10000);
                 // alert("after push_toast");
             };
@@ -676,7 +676,7 @@ var the_vue = new Vue({
             //
             self.ready = true;
             // alert(`${self.status.current_page},${self.status.current_tab},${location}`);
-            self.push_toast('info', `……`);
+            // self.push_toast('info', `……`);
         } catch(error) {
             alert(`${error}`);
             self.push_toptip('warn', `${error}`, 5000);
