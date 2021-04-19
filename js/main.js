@@ -555,7 +555,7 @@ var the_vue = new Vue({
     },
     mounted() {
         let self = this;
-        // alert("created");
+        alert("mounted");
         try {
             // alert("try");
             if (store.enabled) {
