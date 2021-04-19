@@ -2,7 +2,7 @@
 
 function get_title(text) {
     let ll = text.trimLeft().split("\n");
-    return ll[0].length > 36 ? `${ll[0].slice(0,36)}...` : ll[0]
+    return ll[0].length > 63 ? `${ll[0].slice(0,63)}...` : ll[0]
 }
 
 function get_desc(text) {
@@ -142,7 +142,7 @@ var the_vue = new Vue({
                 self.sort_notes();
                 self.push_toptip('success', `笔记清单同步成功`, 500);
             })
-            .catch(({ error }) => self.push_toptip('warn', error));
+            .catch(({ error }) => self.push_toptip('warn', `${error}`));
         },
 
         sort_notes: function() {
@@ -178,7 +178,7 @@ var the_vue = new Vue({
                         self.sort_notes();
                         self.go_hash("notes");
                     })
-                    .catch(({ error }) => self.push_toptip('warn', error));
+                    .catch(({ error }) => self.push_toptip('warn', `${error}`));
                 };
             } else {
                 return Note.add(note)
@@ -192,7 +192,7 @@ var the_vue = new Vue({
                     self.sort_notes();
                     self.go_hash("notes");
                 })
-                .catch(({ error }) => self.push_toptip('warn', error));
+                .catch(({ error }) => self.push_toptip('warn', `${error}`));
             };
         },
 
