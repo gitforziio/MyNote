@@ -33,7 +33,8 @@
     .wrap-inline {display: inline-block; position: relative;}
     .vh-100 {height: 100vh;}
     .title-bar {font-size: 16px; display: flex;}
-    .page-title {margin: 6px 0 8px; font-size: 22px; line-height: 28px;}
+    .topbar_btn {width: 60px; min-height: 40px; font-size: 20px; padding: 6px 0 0;}
+    .page-title {padding: 6px 0 2px; font-size: 22px; line-height: 32px;}
     .edit-content {height: 60vh}
   </style>
   <style type="text/css">
@@ -105,9 +106,9 @@
               <div class="weui-tabbar">
                 <div class="weui-tabbar__item">
                   <div class="weui-flex title-bar">
-                      <div><div class="placeholder"><i class="fas fa-sync"></i></div></div>
+                      <div class="topbar_btn" v-on:click="sync"><i class="fas fa-sync"></i></div>
                       <div class="weui-flex__item"><h2 class="page-title">MyNote</h2></div>
-                      <div v-on:click="go_hash('page-edit')"><i class="fa fa-plus-square"></i></div>
+                      <div class="topbar_btn" v-on:click="go_hash('page-edit')"><i class="fa fa-plus-square"></i></div>
                   </div>
                 </div>
               </div>
@@ -124,34 +125,19 @@
                       </div>
                     </div> -->
                     <div class="weui-panel__bd">
-                      <div>
-                        <a href="#" class="weui-media-box weui-media-box_appmsg">
+                      <div v-if="notes.length" v-for="note in notes">
+                        <a :href="`#post-${note.objectId}`" class="weui-media-box weui-media-box_appmsg">
                           <!-- <div class="weui-media-box__hd"><p>📃</p></div> -->
                           <div class="weui-media-box__bd">
-                            <h4 class="weui-media-box__title">备忘标题</h4>
-                            <p class="weui-media-box__desc">备忘描述……</p>
+                            <h4 class="weui-media-box__title">{{get_title(note.data?.content)}}</h4>
+                            <p class="weui-media-box__desc">{{get_desc(note.data?.content)}}</p>
                             <ul class="weui-media-box__info">
-                              <li class="weui-media-box__info__meta">文字来源</li>
-                              <li class="weui-media-box__info__meta">时间</li>
-                              <li class="weui-media-box__info__meta weui-media-box__info__meta_extra">其它信息</li>
+                              <li class="weui-media-box__info__meta"><span v-if="!is_today(note.updatedAt)">{{display_date(note.updatedAt)}} </span><span v-if="is_today(note.updatedAt)">今天 </span><span>{{display_time(note.updatedAt)}}</span></li>
+                              <li class="weui-media-box__info__meta" v-if="note.data?.pinned">📌</li>
+                              <!-- <li class="weui-media-box__info__meta weui-media-box__info__meta_extra">其它信息</li> -->
                             </ul>
                           </div>
                           <!-- <div class="weui-media-box__ft"><p>🖋</p></div> -->
-                        </a>
-                      </div>
-                      <div v-if="notes.length" v-for="note in notes">
-                        <a :href="`#post-${note.objectId}`" class="weui-media-box weui-media-box_appmsg">
-                          <div class="weui-media-box__hd"><p>📃</p></div>
-                          <div class="weui-media-box__bd">
-                            <h4 class="weui-media-box__title">{{get_title(note.data?.content)}}</h4>
-                            <p class="weui-media-box__desc">{{note.data?.content}}</p>
-                            <ul class="weui-media-box__info">
-                              <li class="weui-media-box__info__meta">文字来源</li>
-                              <li class="weui-media-box__info__meta">时间</li>
-                              <li class="weui-media-box__info__meta weui-media-box__info__meta_extra">其它信息</li>
-                            </ul>
-                          </div>
-                          <div class="weui-media-box__ft"><p>🖋</p></div>
                         </a>
                       </div>
                     </div>
@@ -165,7 +151,7 @@
 
                 </div>
 
-                <div class="page__bd">
+                <!-- <div class="page__bd">
                   <div class="weui-loadmore weui-loadmore_line">
                     <span class="weui-loadmore__tips">暂无数据</span>
                   </div>
@@ -178,7 +164,7 @@
                     </span>
                     <span class="weui-loadmore__tips">正在加载</span>
                   </div>
-                </div>
+                </div> -->
 
 
 
@@ -479,7 +465,7 @@
     </div> -->
     <div class="weui-form__control-area">
       <div class="weui-cells__group weui-cells__group_form">
-        <div class="weui-cells__title">内容</div>
+        <!-- <div class="weui-cells__title">内容</div> -->
         <div class="weui-cells weui-cells_form">
           <div class="weui-cell ">
             <div class="weui-cell__bd">

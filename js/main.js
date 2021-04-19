@@ -1,7 +1,27 @@
 // var vConsole = new VConsole();
 
 function get_title(text) {
-    return text.trimLeft().split("\n")[0].slice(0,36)
+    let ll = text.trimLeft().split("\n");
+    return ll[0].length > 36 ? `${ll[0].slice(0,36)}...` : ll[0]
+}
+
+function get_desc(text) {
+    text = text.replace(/\n+/, "\n");
+    let ll = text.trimLeft().split("\n");
+    return ll[1]? ll.slice(1, ll.length).join(" ") : ll[0]
+}
+
+function display_date(date) {
+    return `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`
+}
+
+function is_today(date) {
+    let dd = new Date;
+    return display_date(dd) == display_date(date)
+}
+
+function display_time(date) {
+    return `${date.getHours()}:${date.getMinutes()}`
 }
 
 var the_vue = new Vue({
@@ -116,12 +136,18 @@ var the_vue = new Vue({
         sync: function() {
             let self = this;
             let Note = LC.CLASS("Note");
-            return Note.orderBy(["createdAt", "updatedAt", "content"]).find()
+            return Note.find()  //.orderBy(["createdAt", "updatedAt", "content"]).find()
             .then((x) => {
                 self.notes = x;
-                self.push_toptip('success', `笔记清单同步成功`);
+                self.sort_notes();
+                self.push_toptip('success', `笔记清单同步成功`, 500);
             })
             .catch(({ error }) => self.push_toptip('warn', error));
+        },
+
+        sort_notes: function() {
+            let self = this;
+            self.notes.sort((a,b)=>{return b.updatedAt - a.updatedAt});
         },
 
         editor_save: function() {
@@ -135,20 +161,25 @@ var the_vue = new Vue({
             };
             let Note = LC.CLASS("Note");
             if (self.editor.objectId) {
-                let that = Note.object(self.editor.objectId);
-                return that.update(note)
-                .then((x)=>{
-                    self.push_toptip('success', `成功更新笔记「${x.objectId}」`, 500);
-                    return Note.object(x.objectId).get();
-                })
-                .then((x)=>{
-                    self.editor.objectId = x.objectId;
-                    self.notes = self.notes.filter(y=>y.objectId!=x.objectId);
-                    self.notes.push(x);
-                    self.notes.sort((a,b)=>{return b.updatedAt - a.updatedAt});
+                if (self.editor.content == self.editor.contentOld) {
+                    self.push_toptip('info', `未修改笔记「${self.editor.objectId}」`, 500);
                     self.go_hash("notes");
-                })
-                .catch(({ error }) => self.push_toptip('warn', error));
+                } else {
+                    let that = Note.object(self.editor.objectId);
+                    return that.update(note)
+                    .then((x)=>{
+                        self.push_toptip('success', `成功更新笔记「${x.objectId}」`, 500);
+                        return Note.object(x.objectId).get();
+                    })
+                    .then((x)=>{
+                        self.editor.objectId = x.objectId;
+                        self.notes = self.notes.filter(y=>y.objectId!=x.objectId);
+                        self.notes.push(x);
+                        self.sort_notes();
+                        self.go_hash("notes");
+                    })
+                    .catch(({ error }) => self.push_toptip('warn', error));
+                };
             } else {
                 return Note.add(note)
                 .then((x)=>{
@@ -158,7 +189,7 @@ var the_vue = new Vue({
                 .then((x)=>{
                     self.editor.objectId = x.objectId;
                     self.notes.push(x);
-                    self.notes.sort((a,b)=>{return b.updatedAt - a.updatedAt});
+                    self.sort_notes();
                     self.go_hash("notes");
                 })
                 .catch(({ error }) => self.push_toptip('warn', error));
