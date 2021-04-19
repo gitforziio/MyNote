@@ -188,7 +188,7 @@ var the_vue = new Vue({
                 },
                 'page-login': function() {
                     self.status.current_page = 0;
-                    alert("go_hash(‘page-login’) done");
+                    alert(`${self.status.current_page}`);
                 },
                 "page-add_post_gzh": function() {
                     self.tools_gzh= {
@@ -663,12 +663,12 @@ var the_vue = new Vue({
                     // alert(`go_hash(‘${location.hash.slice(1,location.hash.length)}’) done`);
                 };
             } else {
-                alert("😄");
+                // alert("😄");
                 self.go_hash("page-login");
             };
             //
             self.ready = true;
-            alert("ready");
+            alert(`${self.status.current_page},${self.status.current_tab},${location}`);
             self.push_toast('info', `……`);
         } catch(error) {
             alert(`${error}`);
