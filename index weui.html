@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>MyNote</title>
+  <link href="https://cdn.bootcdn.net/ajax/libs/weui/2.4.3/style/weui.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vditor@3.8.4/dist/index.css" />
+  <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.3/css/all.css" rel="stylesheet">
+  <!-- <link href="dist/css/weui.min.css" rel="stylesheet"> -->
+  <!-- <link href="css/example.css" rel="stylesheet"> -->
+  <style type="text/css">
+    body, html {height:100%; -webkit-tap-highlight-color:transparent;}
+    body {font-family:-apple-system-font,Helvetica Neue,Helvetica,sans-serif;}
+    ul {list-style:none;}
+    .page, body {background-color:var(--weui-BG-0);}
+    .app {position:absolute; top:0; right:0; bottom:0; left:0; overflow:hidden; color:var(--weui-FG-0);}
+    .pp {position:absolute; top:0; right:0; bottom:0; left:0; overflow-y:auto; -webkit-overflow-scrolling:touch; box-sizing:border-box; z-index:1;}
+    .link {color:var(--weui-LINK);}
+  </style>
+  <style type="text/css">
+    .weui-toptips {display: block; background-color: var(--weui-BG-4);}
+    .weui-toptips_warn {display: block; background-color: var(--weui-RED);}
+    .weui-tabbar__icon > * {line-height: 30px;}
+  </style>
+  <style type="text/css">
+    .weui-tab__panel .weui-cell_example .weui-cell__hd img {width: 20px; height: 20px; display: block; margin-right: 16px;}
+    .weui-tab__panel .demo_badge_cells .weui-cell__bd .demo_badge_desc {font-size: 13px; color: #888;}
+    .weui-panel__hd .weui-flex .weui-flex__item .placeholder {text-align: center;}
+  </style>
+  <style type="text/css">
+    .welcome_cover {position:absolute; top:0; right:0; bottom:0; left:0; background-color:var(--weui-BG-0); z-index: 90000;}
+    .wrap-inline {display: inline-block; position: relative;}
+    .vh-100 {height: 100vh;}
+    .title-bar {font-size: 16px; display: flex;}
+    .topbar_btn {width: 60px; min-height: 40px; font-size: 20px; padding: 6px 0 0;}
+    .page-title {padding: 6px 0 2px; font-size: 22px; line-height: 32px;}
+    .edit-content {height: 60vh}
+  </style>
+  <style type="text/css">
+    * {transition: all 0.25s;}
+    /*.weui-tabbar__item * {transition: all 0.25s;}*/
+    .fade_toast-enter-active, .fade_toast-leave-active {transition: opacity 0.5s;}
+    .fade_toast-enter, .fade_toast-leave-to {opacity: 0; /*display: none;*/}
+    .fade_toptip-enter-active, .fade_toptip-leave-active {transition: opacity 0.5s;}
+    .fade_toptip-enter, .fade_toptip-leave-to {opacity: 0; /*display: none;*/}
+
+
+    .page_anim-enter-active, .page_anim-leave-active {transition: all,0.05s;}
+    .page_anim-enter, .page_anim-leave-to {opacity: 0; /*display: none;*/}
+    .page_anim-enter-active.layer-upper, .page_anim-leave-active.layer-upper {transition: all 0.5s;}
+    .page_anim-enter.layer-upper, .page_anim-leave-to.layer-upper {left: 100vw; right: -100vw; z-index: 4000;}
+    .layer-upper {z-index: 4000;}
+
+
+    .slide-enter-active, .slide-leave-active {transition: opacity 0.25s;}
+    .slide-enter, .slide-leave-to {opacity: 0; /*display: none;*/}
+  </style>
+</head>
+<body>
+<!-- --- -->
+<div class="app __container" id="app">
+<!-- --- -->
+
+
+<div class="welcome_cover" v-if="!ready">
+  <div class="weui-form">
+    <div class="weui-form__text-area">
+      <h2 class="weui-form__title">MyNote</h2>
+      <div class="weui-form__desc">我的专属备忘录</div>
+    </div>
+    <div class="weui-form__tips-area">
+      <p class="weui-form__tips">ver 0.0.1</p>
+    </div>
+    <div class="weui-form__opr-area">
+      <button class="weui-btn weui-btn_primary" href="#" id="loading-btn" disabled="disabled"><span class="weui-primary-loading weui-primary-loading_transparent"><i class="weui-primary-loading__dot"></i></span></button>
+    </div>
+    <div class="weui-form__tips-area">
+      <p class="weui-form__tips" v-if="!store_enabled">您的浏览器不支持存储功能，请关闭隐私模式，或使用更加现代的浏览器！</p>
+      <p class="weui-form__tips">^_^</p>
+    </div>
+    <div class="weui-form__extra-area">
+      <div class="weui-footer">
+        <p class="weui-footer__links">
+          <a href="https://github.com/gitforziio/MyNote" target="_blank" class="weui-footer__link">github</a>
+        </p>
+        <p class="weui-footer__text">L❤️C</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<transition name="page_anim" _mode="out-in" mode="in-out">
+
+<!-- main -->
+<div class="layer pp _page _js_show" id="page-main" ref="page_main" key="page_main" v-if="pages[status.current_page]=='main'">
+  <div class="page__bd" style="height: 100%;">
+    <div class="weui-tab">
+      <transition name="slide" mode="out-in">
+
+        <!-- notes -->
+        <div class="weui-tab__panel" id="notes" key="tab_0" v-if="ui.tab_current==0">
+          <!-- <div class="page__bd"> -->
+            <div class="weui-tab">
+              <div class="weui-tabbar">
+                <div class="weui-tabbar__item">
+                  <div class="weui-flex title-bar">
+                      <div class="topbar_btn" v-on:click="sync"><i class="fas fa-sync"></i></div>
+                      <div class="weui-flex__item"><h2 class="page-title">MyNote</h2></div>
+                      <div class="topbar_btn" v-on:click="go_hash('page-edit')"><i class="fa fa-plus-square"></i></div>
+                  </div>
+                </div>
+              </div>
+              <div class="weui-tab__panel">
+
+                <div class="page__bd">
+
+                  <div class="weui-panel weui-panel_access">
+                    <!-- <div class="weui-panel__hd">
+                      <div class="weui-flex">
+                        <div _class="weui-flex__item"><div class="placeholder"><i class="fas fa-sync"></i></div></div>
+                        <div class="weui-flex__item"><div class="placeholder">我的笔记</div></div>
+                        <div _class="weui-flex__item"><div class="placeholder"><i class="fas fa-plus-square"></i></div></div>
+                      </div>
+                    </div> -->
+                    <div class="weui-panel__bd">
+                      <div v-if="notes.length" v-for="note in notes">
+                        <a :href="`#post-${note.objectId}`" class="weui-media-box weui-media-box_appmsg">
+                          <!-- <div class="weui-media-box__hd"><p>📃</p></div> -->
+                          <div class="weui-media-box__bd">
+                            <h4 class="weui-media-box__title">{{get_title(note.data?.content)}}</h4>
+                            <p class="weui-media-box__desc">{{get_desc(note.data?.content)}}</p>
+                            <ul class="weui-media-box__info">
+                              <li class="weui-media-box__info__meta"><span v-if="!is_today(note.updatedAt)">{{display_date(note.updatedAt)}} </span><span v-if="is_today(note.updatedAt)">今天 </span><span>{{display_time(note.updatedAt)}}</span></li>
+                              <li class="weui-media-box__info__meta" v-if="note.data?.pinned">📌</li>
+                              <!-- <li class="weui-media-box__info__meta weui-media-box__info__meta_extra">其它信息</li> -->
+                            </ul>
+                          </div>
+                          <!-- <div class="weui-media-box__ft"><p>🖋</p></div> -->
+                        </a>
+                      </div>
+                    </div>
+                    <!-- <div class="weui-panel__ft">
+                      <a href="#" class="weui-cell weui-cell_active weui-cell_access weui-cell_link">
+                        <div class="weui-cell__bd">查看更多</div>
+                        <span class="weui-cell__ft"></span>
+                      </a>
+                    </div> -->
+                  </div>
+
+                </div>
+
+                <!-- <div class="page__bd">
+                  <div class="weui-loadmore weui-loadmore_line">
+                    <span class="weui-loadmore__tips">暂无数据</span>
+                  </div>
+                  <div class="weui-loadmore weui-loadmore_line weui-loadmore_dot">
+                    <span class="weui-loadmore__tips"></span>
+                  </div>
+                  <div class="weui-loadmore">
+                    <span class="weui-primary-loading">
+                      <i class="weui-primary-loading__dot"></i>
+                    </span>
+                    <span class="weui-loadmore__tips">正在加载</span>
+                  </div>
+                </div> -->
+
+
+
+              </div>
+            </div>
+          <!-- </div> -->
+
+        </div>
+        <!-- tools -->
+        <div class="weui-tab__panel" id="tools" key="tab_1" v-if="ui.tab_current==1">
+          <div class="page__bd">
+
+            <div class="weui-panel weui-panel_access">
+              <div class="weui-panel__hd">网络内容抓取收藏</div>
+              <div class="weui-panel__bd">
+                <a href="#page-add_post_gzh" class="weui-media-box weui-media-box_appmsg">
+                  <!-- <div class="weui-media-box__hd">
+                  </div> -->
+                  <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title">公众号文章收藏</h4>
+                    <p class="weui-media-box__desc">将微信公众号文章收藏到 LeanCloud 数据库。仅文字。</p>
+                  </div>
+                </a>
+                <a href="#page-please" class="weui-media-box weui-media-box_appmsg">
+                  <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title">知乎专栏收藏</h4>
+                    <p class="weui-media-box__desc">将知乎专栏文章收藏到 LeanCloud 数据库。敬请期待！</p>
+                  </div>
+                </a>
+                <a href="#page-please" class="weui-media-box weui-media-box_appmsg">
+                  <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title">自定义网站收藏</h4>
+                    <p class="weui-media-box__desc">将自定义网站文章收藏到 LeanCloud 数据库。敬请期待！</p>
+                  </div>
+                </a>
+              </div>
+            </div>
+
+            <div class="weui-panel weui-panel_access">
+              <div class="weui-panel__hd">导入导出</div>
+              <div class="weui-panel__bd">
+                <a href="#page-please" class="weui-media-box weui-media-box_appmsg">
+                  <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title">导出为 Markdown</h4>
+                    <p class="weui-media-box__desc">将选中的笔记导出为一个 Markdown 文件。</p>
+                  </div>
+                </a>
+                <a href="#page-please" class="weui-media-box weui-media-box_appmsg">
+                  <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title">导出为 Json</h4>
+                    <p class="weui-media-box__desc">将选中的笔记导出为一个 Json 文件，可以再次导入。</p>
+                  </div>
+                </a>
+                <a href="#page-please" class="weui-media-box weui-media-box_appmsg">
+                  <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title">从 Json 导入</h4>
+                    <p class="weui-media-box__desc">从以前导出的 Json 文件中导入笔记。</p>
+                  </div>
+                </a>
+              </div>
+              <div class="weui-panel__ft">
+                <a href="#page-please" class="weui-cell weui-cell_active weui-cell_access weui-cell_link">
+                    <div class="weui-cell__bd">查看更多</div>
+                    <span class="weui-cell__ft"></span>
+                </a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+
+        <!-- me -->
+        <div class="weui-tab__panel" id="me" key="tab_2" v-if="ui.tab_current==2">
+          <div class="page__bd">
+            <div class="weui-cells__title">我</div>
+            <div class="weui-cells">
+              <div class="weui-cell weui-cell_active weui-cell_access">
+                <div class="weui-cell__bd">{{status.username}}</div>
+              </div>
+            </div>
+
+            <div class="weui-cells__title">深色模式</div>
+            <div class="weui-cells weui-cells_form">
+              <!-- <div class="weui-cells__group weui-cells__group_form"> -->
+                <div class="weui-cell weui-cell_active weui-cell_switch">
+                  <div class="weui-cell__bd">跟随系统</div>
+                  <div class="weui-cell__ft">
+                    <label for="switch_dark_mode_follow_system" class="weui-switch-cp">
+                      <input id="switch_dark_mode_follow_system" class="weui-switch-cp__input" type="checkbox" v-model="settings.dark_mode_follow_system">
+                      <div class="weui-switch-cp__box"></div>
+                    </label>
+                  </div>
+                </div>
+                <div class="weui-cell weui-cell_switch" v-if="!settings.dark_mode_follow_system" :class="{'weui-cell_active':!settings.dark_mode_follow_system}">
+                  <div class="weui-cell__bd">开启或关闭</div>
+                  <div class="weui-cell__ft">
+                    <label for="switch_dark" class="weui-switch-cp">
+                      <input id="switch_dark" class="weui-switch-cp__input" type="checkbox" v-model="settings.dark_mode" :disabled="settings.dark_mode_follow_system">
+                      <div class="weui-switch-cp__box"></div>
+                    </label>
+                  </div>
+                </div>
+              <!-- </div> -->
+            </div>
+
+            <div class="weui-cells__title">MyNote</div>
+            <div class="weui-cells weui-cells_form">
+              <div class="weui-cell weui-cell_active weui-cell_access">
+                <div class="weui-cell__bd">
+                  <span class="demo_badge_title">文档</span>
+                  <!-- <span class="weui-badge">NEW</span> -->
+                </div>
+                <div class="weui-cell__ft"></div>
+              </div>
+              <div class="weui-cell weui-cell_active weui-cell_access">
+                <div class="weui-cell__bd">
+                  <span class="demo_badge_title">关于</span>
+                  <span class="weui-badge">NEW</span>
+                </div>
+                <div class="weui-cell__ft"></div>
+              </div>
+              <!-- <div class="weui-cells__group weui-cells__group_form"> -->
+              <!-- </div> -->
+            </div>
+
+
+        <!-- <div class="weui-cells__title">新消息提示跟摘要信息后，统一在列表右侧</div>
+        <div class="weui-cells">
+            <div class="weui-cell weui-cell_active weui-cell_access">
+                <div class="weui-cell__bd">单行列表</div>
+                <div class="weui-cell__ft" style="font-size: 0;">
+                    <span class="demo_badge_tips">详细信息</span>
+                    <span class="weui-badge weui-badge_dot"></span>
+                </div>
+            </div>
+        </div> -->
+
+        <!-- <div class="weui-cells__title">未读数红点跟在主题信息后，统一在列表左侧</div>
+        <div class="weui-cells demo_badge_cells">
+            <div class="weui-cell weui-cell_active">
+                <div class="weui-cell__hd">
+                    <img src="images/pic_160.png">
+                    <span class="weui-badge">8</span>
+                </div>
+                <div class="weui-cell__bd">
+                    <p>联系人名称</p>
+                    <p class="demo_badge_desc">摘要信息</p>
+                </div>
+            </div>
+            <div class="weui-cell weui-cell_active weui-cell_access">
+                <div class="weui-cell__bd">
+                    <span class="demo_badge_title">单行列表</span>
+                    <span class="weui-badge">8</span>
+                </div>
+                <div class="weui-cell__ft"></div>
+            </div>
+            <div class="weui-cell weui-cell_active weui-cell_access">
+                <div class="weui-cell__bd">
+                    <span class="demo_badge_title">单行列表</span>
+                    <span class="weui-badge">8</span>
+                </div>
+                <div class="weui-cell__ft">详细信息</div>
+            </div>
+            <div class="weui-cell weui-cell_active weui-cell_access">
+                <div class="weui-cell__bd">
+                    <span class="demo_badge_title">单行列表</span>
+                    <span class="weui-badge">New</span>
+                </div>
+                <div class="weui-cell__ft"></div>
+            </div>
+        </div> -->
+
+    </div>
+
+    <div class="weui-form__tips-area">
+      <p class="weui-form__tips">热烈欢迎</p>
+    </div>
+    <div class="weui-form__opr-area">
+      <button class="weui-btn weui-btn_primary" href="#" id="logOut" v-on:click="logOut">退出</button>
+    </div>
+
+
+
+
+
+
+        </div>
+      </transition>
+      <div class="weui-tabbar">
+        <div v-for="(tab, idx) in tabs" class="weui-tabbar__item" :class="{'weui-bar__item_on': tab.active}" v-on:click="go_hash(tab.name)">
+          <div class="wrap-inline">
+            <div class="weui-tabbar__icon"><i :class="[tab.active ? 'fas' : 'far', `fa-${tab.icon}`]"></i></div>
+            <span v-if="tab.msg_num&&tab.show_num" class="weui-badge" style="position: absolute; top: -2px; right: -13px;">{{tab.msg_num}}</span>
+            <span v-if="tab.msg_num&&!tab.show_num" class="weui-badge weui-badge_dot" style="position: absolute; top: 0; right: -6px;"></span>
+          </div>
+          <p class="weui-tabbar__label">{{tab.name}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- add_post_gzh -->
+<div class="layer layer-upper pp _page _js_show" id="page-add_post_gzh" ref="page_add_post_gzh" key="page_add_post_gzh" v-if="pages[status.current_page]=='add_post_gzh'">
+  <div class="weui-form">
+    <div class="weui-form__text-area">
+      <h2 class="weui-form__title">公众号文章收藏</h2>
+      <div class="weui-form__desc">将微信公众号文章收藏到 LeanCloud 数据库。仅文字。</div>
+    </div>
+    <div class="weui-form__control-area">
+      <div class="weui-cells__group weui-cells__group_form">
+        <div class="weui-cells__title">请填写</div>
+        <div class="weui-cells weui-cells_form">
+          <div class="weui-cell weui-cell_active">
+            <div class="weui-cell__hd"><label class="weui-label">url</label></div>
+            <div class="weui-cell__bd">
+              <input id="js_input-gzh-url" class="weui-input" placeholder="请填写正确的微信公众号文章url" v-model="tools_gzh.url">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="weui-cells__group weui-cells__group_form" v-if="tools_gzh.result_text.length">
+        <div class="weui-cells__title">分析结果</div>
+        <div class="weui-cells weui-cells_form">
+          <div class="weui-cell ">
+            <div class="weui-cell__bd">
+              <textarea class="weui-textarea" placeholder="分析结果" rows="6" disabled="disabled" v-model="tools_gzh.result_text"></textarea>
+              <div class="weui-textarea-counter"><span>{{tools_gzh.result_text.length}}</span>字符</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="weui-form__tips-area">
+      <p class="weui-form__tips">热烈欢迎</p>
+    </div> -->
+    <div class="weui-form__opr-area" v-if="!tools_gzh.is_analyzed">
+      <button class="weui-btn weui-btn_primary" :class="{'weui-btn_disabled':!tools_gzh_check_url(), 'weui-btn_loading':tools_gzh.is_analyzing}" href="#" id="tools_gzh_analyze" :disabled="!tools_gzh_check_url()" v-on:click="tools_gzh_analyze"><span v-if="tools_gzh.is_analyzing" class="weui-primary-loading weui-primary-loading_transparent"><i class="weui-primary-loading__dot"></i></span>分析</button>
+    </div>
+    <div class="weui-form__tips-area">
+      <p class="weui-form__tips">^_^</p>
+    </div>
+    <div class="weui-form__extra-area">
+      <div class="weui-footer">
+        <p class="weui-footer__links">
+          <a href="#tools" class="weui-footer__link">返回</a>
+        </p>
+        <p class="weui-footer__text">L❤️C</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- please -->
+<div class="layer layer-upper pp _page _js_show" id="page-please" ref="page_please" key="page_please" v-if="pages[status.current_page]=='please'">
+  <div class="weui-form">
+    <div class="weui-form__text-area">
+      <h2 class="weui-form__title">敬请期待</h2>
+      <div class="weui-form__desc">该功能尚未实现，敬请期待！</div>
+    </div>
+    <div class="weui-form__control-area">
+      <div class="weui-cells__group weui-cells__group_form">
+        <div class="weui-cells__title">敬请期待</div>
+        <div class="weui-cells weui-cells_form">
+          <div class="weui-cell weui-cell_active">
+            <div class="weui-cell__hd"><label class="weui-label">不必填写</label></div>
+            <div class="weui-cell__bd">
+              <input id="js_input-please" class="weui-input" placeholder="敬请期待">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="weui-form__opr-area">
+      <button class="weui-btn weui-btn_primary" id="please-ok" v-on:click="go_hash('tools')">好的</button>
+    </div>
+    <div class="weui-form__tips-area">
+      <p class="weui-form__tips">^_^</p>
+    </div>
+    <div class="weui-form__extra-area">
+      <div class="weui-footer">
+        <p class="weui-footer__links">
+          <a href="#tools" class="weui-footer__link">返回</a>
+        </p>
+        <p class="weui-footer__text">L❤️C</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- edit -->
+<div class="layer layer-upper pp _page _js_show" id="page-edit" ref="page_edit" key="page_edit" v-if="pages[status.current_page]=='edit'">
+  <div class="weui-form">
+    <!-- <div class="weui-form__text-area">
+      <h2 class="weui-form__title">编辑内容</h2>
+      <div class="weui-form__desc">编辑内容</div>
+    </div> -->
+    <div class="weui-form__control-area">
+      <div class="weui-cells__group weui-cells__group_form">
+        <!-- <div class="weui-cells__title">内容</div> -->
+        <div class="weui-cells weui-cells_form">
+          <div class="weui-cell ">
+            <div class="weui-cell__bd">
+              <textarea class="weui-textarea edit-content" placeholder="编辑内容" v-model="editor.content"></textarea>
+              <!-- <div id="vditor"></div> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="weui-form__opr-area">
+      <button class="weui-btn weui-btn_primary" id="please-ok" v-on:click="editor_save">保存</button>
+    </div>
+    <div class="weui-form__tips-area">
+      <p class="weui-form__tips">^_^</p>
+    </div>
+    <div class="weui-form__extra-area">
+      <div class="weui-footer">
+        <p class="weui-footer__links">
+          <a href="#tools" class="weui-footer__link">返回</a>
+        </p>
+        <p class="weui-footer__text">L❤️C</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- login -->
+<div class="layer layer-upper pp _page _js_show" id="page-login" ref="page_login" key="page_login" v-if="pages[status.current_page]=='login'">
+  <div class="weui-form">
+    <div class="weui-form__text-area">
+      <h2 class="weui-form__title">MyNote</h2>
+      <div class="weui-form__desc">请登录</div>
+    </div>
+    <div class="weui-form__control-area">
+      <div class="weui-cells__group weui-cells__group_form">
+        <div class="weui-cells__title">LeanCloud</div>
+        <div class="weui-cells weui-cells_form">
+          <div class="weui-cell weui-cell_active">
+            <div class="weui-cell__hd"><label class="weui-label">Keys</label></div>
+            <div class="weui-cell__bd">
+              <input id="js_input-lc-keys" class="weui-input" placeholder="LeanCloud Keys String" v-model="lean_cloud_keys_str">
+            </div>
+          </div>
+          <!-- <div class="weui-cell weui-cell_active">
+            <div class="weui-cell__hd"><label class="weui-label">appId</label></div>
+            <div class="weui-cell__bd">
+              <input id="js_input-lc-appid" class="weui-input" placeholder="LeanCloud appId" v-model="lean_cloud_keys.appId">
+            </div>
+          </div>
+          <div class="weui-cell weui-cell_active">
+            <div class="weui-cell__hd"><label class="weui-label">appKey</label></div>
+            <div class="weui-cell__bd">
+              <input id="js_input-lc-appkey" class="weui-input" placeholder="LeanCloud appKey" v-model="lean_cloud_keys.appKey">
+            </div>
+          </div>
+          <div class="weui-cell weui-cell_active">
+            <div class="weui-cell__hd"><label class="weui-label">serverURL</label></div>
+            <div class="weui-cell__bd">
+              <input id="js_input-lc-sever-url" class="weui-input" placeholder="LeanCloud serverURL" v-model="lean_cloud_keys.serverURL" __pattern="[0-9]*">
+            </div>
+          </div> -->
+        </div>
+      </div>
+      <div class="weui-cells__group weui-cells__group_form">
+        <div class="weui-cells__title">用户</div>
+        <div class="weui-cells weui-cells_form">
+          <div class="weui-cell weui-cell_active">
+            <div class="weui-cell__hd"><label class="weui-label">用户名</label></div>
+            <div class="weui-cell__bd">
+              <input id="js_input-username" class="weui-input" placeholder="请输入用户名" v-model="user.username">
+            </div>
+          </div>
+          <div class="weui-cell weui-cell_active">
+            <div class="weui-cell__hd"><label class="weui-label">密码</label></div>
+            <div class="weui-cell__bd">
+              <input id="js_input-password" class="weui-input" type="password" placeholder="请输入密码" v-model="user.password">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="weui-cells__group weui-cells__group_form">
+        <div class="weui-cells__title">设置</div>
+        <div class="weui-cells weui-cells_form">
+          <div class="weui-cell weui-cell_active weui-cell_switch">
+            <div class="weui-cell__bd">记住 Keys</div>
+            <div class="weui-cell__ft">
+              <label for="switch_remember_keys" class="weui-switch-cp">
+                <input id="switch_remember_keys" class="weui-switch-cp__input" type="checkbox" v-model="settings.remember_keys">
+                <div class="weui-switch-cp__box"></div>
+              </label>
+            </div>
+          </div>
+          <div class="weui-cell weui-cell_active weui-cell_switch">
+            <div class="weui-cell__bd">记住用户名</div>
+            <div class="weui-cell__ft">
+              <label for="switch_remember_user" class="weui-switch-cp">
+                <input id="switch_remember_user" class="weui-switch-cp__input" type="checkbox" v-model="settings.remember_user">
+                <div class="weui-switch-cp__box"></div>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="weui-form__tips-area">
+      <p class="weui-form__tips">热烈欢迎</p>
+    </div>
+    <div class="weui-form__opr-area">
+      <button class="weui-btn weui-btn_primary" :class="{'weui-btn_disabled':(user.username==''||user.password==''||lean_cloud_keys_str==''), 'weui-btn_loading':status.loginning}" href="#" id="login" :disabled="(user.username==''||user.password==''||lean_cloud_keys_str=='')" v-on:click="login"><span v-if="status.loginning" class="weui-primary-loading weui-primary-loading_transparent"><i class="weui-primary-loading__dot"></i></span>登录</button>
+    </div>
+    <div class="weui-form__tips-area">
+      <p class="weui-form__tips">^_^</p>
+    </div>
+    <div class="weui-form__extra-area">
+      <div class="weui-footer">
+        <p class="weui-footer__links">
+          <a href="https://github.com/gitforziio/MyNote" target="_blank" class="weui-footer__link">github</a>
+        </p>
+        <p class="weui-footer__text">L❤️C</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+</transition>
+
+
+
+<!-- toasts -->
+<div class="layer" id="wrap-toasts" ref="wrap_toasts"><transition name="fade_toast" v-for="toast in ui.toasts">
+  <div :mynote--toast-type="toast.type" v-if="toast.show">
+    <div class="weui-mask_transparent"></div>
+    <div class="weui-toast" :class="{'weui-toast_text': true||toast.type=='text'}">
+      <i class="weui-icon-success-no-circle weui-icon_toast" v-if="toast.type=='success'"></i>
+      <i class="weui-icon-warn weui-icon_toast" v-if="toast.type=='warn'||toast.type=='warning'||toast.type=='danger'"></i>
+      <span class="weui-primary-loading weui-icon_toast" v-if="toast.type=='loading'">
+        <span class="weui-primary-loading__dot"></span>
+      </span>
+      <p class="weui-toast__content">{{toast.content}}</p>
+    </div>
+  </div>
+</transition></div>
+
+<!-- toptips -->
+<div class="layer" id="wrap-toptips" ref="wrap_toptips"><transition name="fade_toptip" v-for="toptip in ui.toptips">
+  <div v-if="toptip.show" class="weui-toptips" :class="{'weui-toptips_warn': toptip.type=='warn'}">{{toptip.content}}</div>
+</transition></div>
+
+
+
+<div id="vditor" style="display: none;"></div>
+
+
+<!-- --- -->
+</div>
+<!-- --- -->
+<!-- <script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.4.1/vconsole.min.js"></script> -->
+<script src="https://cdn.bootcdn.net/ajax/libs/store.js/2.0.9/store.legacy.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vditor@3.8.4/dist/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leancloud-storage@5.0.0-beta.0/dist/browser/lc.min.js"></script>
+<!-- <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script> -->
+<!-- <script src="https://cdn.bootcdn.net/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script> -->
+<script src="https://cdn.bootcss.com/vue/2.6.11/vue.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/vue-router/3.5.1/vue-router.min.js"></script>
+<!-- <script type="text/javascript" src="dist/js/vue_2.6.11_.min.js"></script> -->
+<script type="text/javascript" src="js/main.js"></script>
+</body>
+</html>
