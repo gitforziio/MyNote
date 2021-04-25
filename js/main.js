@@ -51,6 +51,7 @@ var the_vue = new Vue({
             current_page: 0,
             current_tab: 0,
             loginning: false,
+            syncing: false,
         },
         "ready": false,
         "store_enabled": true,
@@ -100,6 +101,7 @@ var the_vue = new Vue({
             toptips_last_idx: 1,
             toptips: [],
         },
+        "contentEditor": "",
         "editor": {
             objectId: "",
             content: "",
@@ -135,11 +137,13 @@ var the_vue = new Vue({
 
         sync: function() {
             let self = this;
+            self.status.syncing = true;
             let Note = LC.CLASS("Note");
             return Note.find()  //.orderBy(["createdAt", "updatedAt", "content"]).find()
             .then((x) => {
                 self.notes = x;
                 self.sort_notes();
+                self.status.syncing = false;
                 self.push_toptip('success', `笔记清单同步成功`, 500);
             })
             .catch(({ error }) => self.push_toptip('warn', `${error}`));
@@ -243,6 +247,7 @@ var the_vue = new Vue({
                     self.editor.contentOld = self.editor.content;
                     self.editor.content = "";
                     self.status.current_page = 6;
+                    self.contentEditor.setValue(self.editor.content);
                 },
             };
             if (self.status.logged_in) {
@@ -255,7 +260,7 @@ var the_vue = new Vue({
                     //
                     let xx = self.notes.filter(x=>x.objectId==noteID)[0];
                     if (xx) {
-                        xxx = xx.data;
+                        let xxx = xx.data;
                         xxx.contentOld = xxx.content;
                         xxx.objectId = xx.objectId;
                         xxx.createdAt = xx.createdAt;
@@ -266,6 +271,7 @@ var the_vue = new Vue({
                     };
                     self.status.current_page = 6;
                     location.hash = hash;
+                    self.contentEditor.setValue(self.editor.content);
                 } else {
                     self.go_hash(`notes`);
                     location.hash = `notes`;
@@ -431,6 +437,7 @@ var the_vue = new Vue({
                     author: result.meta[2].meta_value,
                     description: result.meta[3].meta_value,
                     abstract: result.content[0].meta_value,
+                    url: self.tools_gzh.url,
                 };
                 self.tools_gzh.result_text = JSON.stringify(self.tools_gzh.result_obj);
                 self.tools_gzh.is_analyzing = false;
@@ -705,9 +712,19 @@ var the_vue = new Vue({
                 self.go_hash("page-login");
             };
             //
+            // setTimeout(() => {self.ready = true}, 100);
             self.ready = true;
             // alert(`${self.status.current_page},${self.status.current_tab},${location}`);
             // self.push_toast('info', `……`);
+            //
+            self.contentEditor = new Vditor('vditor', {
+                toolbarConfig: {pin: true,},
+                cache: {enabled: false},
+                after: () => {
+                    self.contentEditor.setValue("");
+                },
+            });
+            //
         } catch(error) {
             alert(`${error}`);
             self.push_toptip('warn', `${error}`, 5000);
@@ -716,9 +733,9 @@ var the_vue = new Vue({
     updated() {
         let self = this;
         if (self.settings.dark_mode_follow_system) {
-            document.querySelector('body').removeAttribute('data-weui-theme');
+            document.querySelector('body').removeAttribute('data-theme');
         } else {
-            document.querySelector('body').setAttribute('data-weui-theme', self.settings.dark_mode?'dark':'light');
+            document.querySelector('body').setAttribute('data-theme', self.settings.dark_mode?'dark':'light');
         };
         if (self.status.lc_initiated) {self.status.logged_in = LC.User.current() ? true : false;};
         self.saveDataToLocalStorage();
