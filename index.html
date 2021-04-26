@@ -26,6 +26,14 @@
       color: #9aa2aa !important;
     }
 
+    .overflow-hidden {
+      overflow: hidden;
+    }
+
+    .overflow-auto {
+      overflow: auto;
+    }
+
     html, body {font-size: 16px;}
 
     .app {
@@ -38,7 +46,7 @@
 
     .alert-wrap {
       position: fixed;
-      top: 1rem;
+      bottom: 1rem;
       right: 1rem;
       z-index: 2060;
       display: none;
@@ -70,10 +78,6 @@
       /*z-index: 2040;*/
     }
 
-    #vditor {
-      height: 100%;
-    }
-
     #editor-textarea {
       /*height: 100%;*/
     }
@@ -91,7 +95,19 @@
       /*overflow: initial;*/
       /*height: initial;*/
     }
-
+  </style>
+  <style type="text/css">
+    .vditor-wrap {
+      height: 100%;
+      overflow: auto;
+    }
+    /*#vditor {height: 95%;}
+    #vditor .vditor-content {height: 100%;}
+    #vditor .vditor-content .vditor-ir {height: 100%;}
+    #vditor .vditor-content .vditor-ir .vditor-reset {height: 100%;}*/
+    /*.vditor-toolbar--hide {display: none;}*/
+  </style>
+  <style type="text/css">
     /*[data-theme="dark"] {
       background-color: #111 !important;
       color: #eee;
@@ -214,7 +230,7 @@
           <div v-if="notes.length" class="container">
             <div v-for="note in notes" v-on:click="go_hash(`post-${note.objectId}`)" class="row my-4">
               <div class="col col-12">
-                <h5 class="mt-2 w-75 line-clamp-1">{{get_title(note.data?.content)}}</h5>
+                <h6 class="mt-2 w-75 line-clamp-1">{{get_title(note.data?.content)}}</h6>
               </div>
               <div class="col col-12">
                 <p class="mb-2 line-clamp-2 text-secondary">{{get_desc(note.data?.content)}}</p>
@@ -559,12 +575,10 @@
       </div>
     </div>
     <div class="tool-wrap text-start">
-      <div class="container h-100 pb-2">
-        <!-- <div class="row mt-4 mb-2 text-center text-secondary">
-          <div class="col col-12 my-2"> -->
-            <div id="vditor"></div>
-          <!-- </div>
-        </div> -->
+      <div class="container h-100 pb-2 overflow-auto">
+        <div class="vditor-wrap">
+          <div id="vditor"></div>
+        </div>
       </div>
     </div>
   </div>

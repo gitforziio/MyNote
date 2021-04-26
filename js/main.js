@@ -781,7 +781,7 @@ var the_vue = new Vue({
             // self.push_toast('info', `……`);
             //
             self.contentEditor = new Vditor('vditor', {
-                toolbarConfig: {pin: true,},
+                toolbarConfig: {pin: false, hide: true,},
                 cache: {enabled: false},
                 after: () => {
                     self.contentEditor.setValue("");
