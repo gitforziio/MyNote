@@ -28,6 +28,32 @@
 
     html, body {font-size: 16px;}
 
+    i.fa, i.fas, i.far {min-width: 1.2em;}
+
+    .alert-wrap {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 2050;
+      display: none;
+      width: 360px;
+      max-width: 80vw;
+      overflow: hidden;
+      outline: 0;
+    }
+
+    #page-login {
+      z-index: 9999;
+    }
+
+    #page-login.ready {
+      z-index: 2040;
+    }
+
+    #editor-textarea {
+      height: 90vh;
+    }
+
     .hidden-before-ready {
       /*transition: all 5s;*/
       display: none;
@@ -71,7 +97,7 @@
       position:absolute;
       top:0; right:0; bottom:0; left:0;
       overflow: auto;
-      z-index: 90000;
+      z-index: 2040;
       background-color: var(--BG);
     }
     .page {
@@ -79,9 +105,6 @@
       top:0; right:0; bottom:0; left:0;
       overflow: auto;
       background-color: var(--BG);
-    }
-    #page-login {
-      z-index: 90000;
     }
 
     .panel-wrap {
@@ -100,6 +123,8 @@
   </style>
   <style type="text/css">
     * {transition: all 0.25s;}
+    .fade-enter-active, .fade-leave-active {transition: opacity 0.5s;}
+    .fade-enter, .fade-leave-to {opacity: 0; /*display: none;*/}
     /*.weui-tabbar__item * {transition: all 0.25s;}*/
     .fade_toast-enter-active, .fade_toast-leave-active {transition: opacity 0.5s;}
     .fade_toast-enter, .fade_toast-leave-to {opacity: 0; /*display: none;*/}
@@ -110,8 +135,9 @@
     .page_anim-enter-active, .page_anim-leave-active {transition: all,0.05s;}
     .page_anim-enter, .page_anim-leave-to {opacity: 0; /*display: none;*/}
     .page_anim-enter-active.layer-upper, .page_anim-leave-active.layer-upper {transition: all 0.5s;}
-    .page_anim-enter.layer-upper, .page_anim-leave-to.layer-upper {top: -100vh; bottom: 100vh; z-index: 4000;}
-    .layer-upper {z-index: 4000;}
+    /*.page_anim-enter.layer-upper, .page_anim-leave-to.layer-upper {top: -100vh; bottom: 100vh; z-index: 2030;}*/
+    .page_anim-enter.layer-upper, .page_anim-leave-to.layer-upper {right: -100vw; left: 100vw; z-index: 2030;}
+    .layer-upper {z-index: 2030;}
 
 
     .slide-enter-active, .slide-leave-active {transition: opacity 0.25s;}
@@ -243,7 +269,7 @@
             <div></div>
           </div>
         </div>
-        <div class="tools-wrap">
+        <div class="tools-wrap mt-3">
           <div class="container">
             <div class="row my-3">
               <div class="col col-12">
@@ -263,9 +289,9 @@
               </div>
             </div>
             <!-- --- -->
-            <div class="row my-3">
+            <div class="row mt-5 mb-3">
               <div class="col col-12">
-                <button class="btn btn-primary" id="logOut" v-on:click="logOut">退出</button>
+                <button class="btn btn-sm btn-primary" id="logOut" v-on:click="logOut">退出</button>
               </div>
             </div>
             <!-- --- -->
@@ -296,7 +322,9 @@
       <div class="tabbar-tab-wrap mx-2 text-secondary">
         <div><span class="fs-5 fw-bold">公众号文章收藏</span></div>
       </div>
-      <div class="tabbar-tab-wrap mx-2"></div>
+      <div class="tabbar-tab-wrap mx-2">
+        <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-ellipsis-h"></i></button>
+      </div>
     </div>
     <div class="tool-wrap text-start">
       <div class="container">
@@ -314,8 +342,24 @@
           </div>
         </div>
         <div class="row my-2" v-if="tools_gzh.is_analyzed">
+          <div class="col col-12">
+            <h5 class="mt-2 w-75 line-clamp-1">{{get_title(tools_gzh.result_obj.title)}}</h5>
+          </div>
+          <div class="col col-12">
+            <p class="mb-2 line-clamp-2 text-secondary">{{get_desc(tools_gzh.result_obj.abstract)}}…</p>
+          </div>
+          <div class="col col-12">
+            <small class="text-secondary"><span class="me-3">{{tools_gzh.result_obj.channel}}</span><span class="me-3" v-if="tools_gzh.result_obj.author">{{tools_gzh.result_obj.author}}</span></small>
+          </div>
+        </div>
+        <div class="row my-2" v-if="tools_gzh.is_analyzed">
           <div class="col col-12 my-2">
             <textarea class="form-control" placeholder="分析结果" disabled="disabled" v-model="tools_gzh.result_text"></textarea>
+          </div>
+        </div>
+        <div class="row mt-5 mb-2" v-if="tools_gzh.is_analyzed">
+          <div class="d-grid gap-2 col-6 col-md-4 col-lg-3 mx-auto">
+            <button class="btn btn-primary" type="button" __v-on:click="tools_gzh_save">保存(敬请期待)</button>
           </div>
         </div>
         <div class="row mt-5 mb-2" v-if="!tools_gzh.is_analyzed">
@@ -329,80 +373,60 @@
 </div>
 
 <!-- please -->
-<div class="layer layer-upper pp _page _js_show" id="page-please" ref="page_please" key="page_please" v-if="pages[status.current_page]=='please'">
-  <div class="weui-form">
-    <div class="weui-form__text-area">
-      <h2 class="weui-form__title">敬请期待</h2>
-      <div class="weui-form__desc">该功能尚未实现，敬请期待！</div>
-    </div>
-    <div class="weui-form__control-area">
-      <div class="weui-cells__group weui-cells__group_form">
-        <div class="weui-cells__title">敬请期待</div>
-        <div class="weui-cells weui-cells_form">
-          <div class="weui-cell weui-cell_active">
-            <div class="weui-cell__hd"><label class="weui-label">不必填写</label></div>
-            <div class="weui-cell__bd">
-              <input id="js_input-please" class="weui-input" placeholder="敬请期待">
-            </div>
-          </div>
-        </div>
+<div class="d-flex flex-column text-center page layer-upper" id="page-please" ref="page_please" key="page_please" v-if="pages[status.current_page]=='please'">
+  <div class="d-flex flex-column panel">
+    <div class="container d-flex py-2 align-items-center justify-content-between text-center tabbar">
+      <div class="tabbar-tab-wrap mx-2">
+        <button class="btn btn-sm btn-outline-secondary" v-on:click="go_hash(`tools`)"><i class="fas fa-chevron-left"></i></button>
+      </div>
+      <div class="tabbar-tab-wrap mx-2 text-secondary">
+        <div><span class="fs-5 fw-bold">敬请期待</span></div>
+      </div>
+      <div class="tabbar-tab-wrap mx-2">
+        <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-ellipsis-h"></i></button>
       </div>
     </div>
-    <div class="weui-form__opr-area">
-      <button class="weui-btn weui-btn_primary" id="please-ok" v-on:click="go_hash('tools')">好的</button>
-    </div>
-    <div class="weui-form__tips-area">
-      <p class="weui-form__tips">^_^</p>
-    </div>
-    <div class="weui-form__extra-area">
-      <div class="weui-footer">
-        <p class="weui-footer__links">
-          <a href="#tools" class="weui-footer__link">返回</a>
-        </p>
-        <p class="weui-footer__text">L❤️C</p>
+    <div class="tool-wrap text-start">
+      <div class="container">
+        <div class="row mt-4 mb-2 text-center text-secondary">
+          <div class="col col-12 my-2">
+            <p>该功能尚未实现，敬请期待！</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
 <!-- edit -->
-<div class="layer layer-upper pp _page _js_show" id="page-edit" ref="page_edit" key="page_edit" v-if="pages[status.current_page]=='edit'">
-  <div class="weui-form">
-    <!-- <div class="weui-form__text-area">
-      <h2 class="weui-form__title">编辑内容</h2>
-      <div class="weui-form__desc">编辑内容</div>
-    </div> -->
-    <div class="weui-form__control-area">
-      <div class="weui-cells__group weui-cells__group_form">
-        <!-- <div class="weui-cells__title">内容</div> -->
-        <div class="weui-cells weui-cells_form">
-          <div class="weui-cell ">
-            <div class="weui-cell__bd">
-              <textarea class="weui-textarea edit-content" placeholder="编辑内容" v-model="editor.content"></textarea>
-            </div>
-          </div>
-        </div>
+<div class="d-flex flex-column text-center page layer-upper" id="page-edit" ref="page_edit" key="page_edit" v-if="pages[status.current_page]=='edit'">
+  <div class="d-flex flex-column panel">
+    <div class="container d-flex py-2 align-items-center justify-content-between text-center tabbar">
+      <div class="tabbar-tab-wrap mx-2">
+        <button class="btn btn-sm btn-outline-secondary" v-on:click="go_hash(`notes`)"><i class="fas fa-chevron-left"></i></button>
+      </div>
+      <!-- <div class="tabbar-tab-wrap mx-2 text-secondary">
+        <div><span class="fs-5 fw-bold">编辑</span></div>
+      </div> -->
+      <div class="tabbar-tab-wrap mx-2">
+        <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-ellipsis-h"></i></button>
+        <button class="btn btn-sm btn-outline-secondary" :disabled="!editor.content" v-on:click="editor_save"><span v-if="0"><i class="fas fa-spinner fa-pulse"></i></span><span __v-if="1"><i class="far fa-save"></i></span></button>
       </div>
     </div>
-    <div class="weui-form__opr-area">
-      <button class="weui-btn weui-btn_primary" id="please-ok" v-on:click="editor_save">保存</button>
-    </div>
-    <div class="weui-form__tips-area">
-      <p class="weui-form__tips">^_^</p>
-    </div>
-    <div class="weui-form__extra-area">
-      <div class="weui-footer">
-        <p class="weui-footer__links">
-          <a href="#tools" class="weui-footer__link">返回</a>
-        </p>
-        <p class="weui-footer__text">L❤️C</p>
+    <div class="tool-wrap text-start">
+      <div class="container">
+        <!-- <div class="row mt-4 mb-2 text-center text-secondary">
+          <div class="col col-12 my-2"> -->
+            <textarea class="form-control" id="editor-textarea" placeholder="编辑内容" v-model="editor.content"></textarea>
+          <!-- </div>
+        </div> -->
       </div>
     </div>
   </div>
 </div>
 
 <!-- login -->
-<div class="d-flex flex-column text-center page layer-upper" id="page-login" ref="page_login" key="page_login" v-if="pages[status.current_page]=='login'">
+<div class="d-flex flex-column text-center page layer-upper" :class="{'ready': true}" id="page-login" ref="page_login" key="page_login" v-if="pages[status.current_page]=='login'">
   <div class="mt-5 pt-5 mb-3"><h2>MyNote</h2></div>
   <div class="mb-5">
     <p><small>我的专属备忘录</small></p>
@@ -480,6 +504,13 @@
   <div v-if="toptip.show" class="weui-toptips" :class="{'weui-toptips_warn': toptip.type=='warn'}">{{toptip.content}}</div>
 </transition></div>
 
+<!-- Alert -->
+<div class="alert-wrap" style="display: block;" ref="alert_wrap">
+    <transition name = "fade" v-for="alert in ui.alerts"><div v-show="alert.show" class="alert alert-dismissible alert-success" :class="'alert-'+alert.class">
+        <button type="button" class="btn-close" v-on:click="remove_alert(alert.idx)"></button>
+        <div>{{alert.content}}</div>
+    </div></transition>
+</div>
 
 
 

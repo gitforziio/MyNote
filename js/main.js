@@ -100,6 +100,8 @@ var the_vue = new Vue({
             toasts: [],
             toptips_last_idx: 1,
             toptips: [],
+            alerts_last_idx: 1,
+            alerts: [],
         },
         "contentEditor": "",
         "editor": {
@@ -164,6 +166,10 @@ var the_vue = new Vue({
                 // deleted: self.editor.deleted,
             };
             let Note = LC.CLASS("Note");
+            if (!self.editor.objectId && location.hash.slice(0,5)=="#post") {
+                let noteID = location.hash.slice(6, location.hash.length);
+                self.editor.objectId = noteID;
+            };
             if (self.editor.objectId) {
                 if (self.editor.content == self.editor.contentOld) {
                     self.push_toptip('info', `未修改笔记「${self.editor.objectId}」`, 500);
@@ -247,7 +253,9 @@ var the_vue = new Vue({
                     self.editor.contentOld = self.editor.content;
                     self.editor.content = "";
                     self.status.current_page = 6;
-                    self.contentEditor.setValue(self.editor.content);
+                    if (self.contentEditor.setValue) {
+                        self.contentEditor.setValue(self.editor.content);
+                    };
                 },
             };
             if (self.status.logged_in) {
@@ -271,7 +279,9 @@ var the_vue = new Vue({
                     };
                     self.status.current_page = 6;
                     location.hash = hash;
-                    self.contentEditor.setValue(self.editor.content);
+                    if (self.contentEditor.setValue) {
+                        self.contentEditor.setValue(self.editor.content);
+                    };
                 } else {
                     self.go_hash(`notes`);
                     location.hash = `notes`;
@@ -336,13 +346,14 @@ var the_vue = new Vue({
         logOut: function() {
             let self = this;
             LC.User.logOut();
-            self.push_toast('text', `再见${self.status.username}！`);
+            self.push_toast('text', `再见${self.status.username}！`, 1000);
             self.status.username = "";
             self.user.password = "";
             self.status.logged_in = false;
             self.go_hash("page-login");
             // self.refresh();
-            location.reload();
+            setTimeout(() => {location.reload()}, 1500);
+            // location.reload();
         },
 
         tools_gzh_check_url() {
@@ -513,41 +524,59 @@ var the_vue = new Vue({
             // return greeting = await Promise.resolve("Hello");
         },
 
-        push_toast: function(typ="text", ctt="🐵", tot=2000) {
+        push_alert: function(typ="text", ctt="🐵", tot=2000) {
             let self = this;
-            console.log(['push_toast', typ, ctt, tot]);
-            let idx = self.ui.toasts_last_idx+1;
-            self.ui.toasts.push({
+            console.log(['push_alert', typ, ctt, tot]);
+            let idx = self.ui.alerts_last_idx+1;
+            self.ui.alerts.push({
                 'idx': idx,
                 'type': typ,
                 'content': ctt,
                 'show': 1,
             });
-            self.ui.toasts_last_idx += 1;
+            self.ui.alerts_last_idx += 1;
+            let that = self;
+            setTimeout(()=>{that.remove_alert(idx);}, tot);
+        },
+        remove_alert: function(idx) {
+            let self = this;
+            self.ui.alerts.filter(alert => alert.idx==idx)[0].show = 0;
+        },
+        push_toast: function(typ="text", ctt="🐵", tot=2000) {
+            let self = this;
+            console.log(['push_toast', typ, ctt, tot]);
+            let idx = self.ui.alerts_last_idx+1;
+            self.ui.alerts.push({
+                'idx': idx,
+                'type': typ,
+                'content': ctt,
+                'show': 1,
+            });
+            self.ui.alerts_last_idx += 1;
             let that = self;
             setTimeout(()=>{that.remove_toast(idx);}, tot);
         },
         remove_toast: function(idx) {
             let self = this;
-            self.ui.toasts.filter(toast => toast.idx==idx)[0].show = 0;
+            self.ui.alerts.filter(toast => toast.idx==idx)[0].show = 0;
         },
         push_toptip: function(typ="text", ctt="🐵", tot=2000) {
             let self = this;
             console.log(['push_toptip', typ, ctt, tot]);
-            let idx = self.ui.toptips_last_idx+1;
-            self.ui.toptips.push({
+            let idx = self.ui.alerts_last_idx+1;
+            self.ui.alerts.push({
                 'idx': idx,
                 'type': typ,
                 'content': ctt,
                 'show': 1,
             });
-            self.ui.toptips_last_idx += 1;
+            self.ui.alerts_last_idx += 1;
             let that = self;
             setTimeout(()=>{that.remove_toptip(idx);}, tot);
         },
         remove_toptip: function(idx) {
             let self = this;
-            self.ui.toptips.filter(toptip => toptip.idx==idx)[0].show = 0;
+            self.ui.alerts.filter(toptip => toptip.idx==idx)[0].show = 0;
         },
         user_agent: function() {
             return navigator.userAgent;
@@ -605,6 +634,8 @@ var the_vue = new Vue({
                 self.ui.toptips = [];
                 self.ui.toasts_last_idx = 1;
                 self.ui.toasts = [];
+                self.ui.alerts_last_idx = 1;
+                self.ui.alerts = [];
                 // alert("before push_toast");
                 // self.push_toast('info', `【测试】`, 10000);
                 // alert("after push_toast");
@@ -615,6 +646,8 @@ var the_vue = new Vue({
                 self.ui.toptips = [];
                 self.ui.toasts_last_idx = 1;
                 self.ui.toasts = [];
+                self.ui.alerts_last_idx = 1;
+                self.ui.alerts = [];
                 // alert("before push_toast");
                 // self.push_toast('info', `【测试】`, 10000);
                 self.push_toptip('warn', `您的浏览器不支持存储功能，请关闭隐私模式，或使用更加现代的浏览器！`, 10000);
