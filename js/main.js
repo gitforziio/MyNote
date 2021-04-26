@@ -244,6 +244,7 @@ var the_vue = new Vue({
         go_hash: function(hash) {
             let self = this;
             // console.log(`go to: ${hash}`);
+            self.vditor_close();
             let _map = {
                 'notes': function() {
                     self.go_tab(0);
