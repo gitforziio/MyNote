@@ -103,6 +103,9 @@ var the_vue = new Vue({
             alerts_last_idx: 1,
             alerts: [],
         },
+        "vditor": {
+            show: false,
+        },
         "contentEditor": "",
         "editor": {
             objectId: "",
@@ -136,6 +139,28 @@ var the_vue = new Vue({
 
 
     methods: {
+
+        vditor_open: function() {
+            let self = this;
+            if (self.contentEditor.setValue) {
+                self.contentEditor.setValue(self.editor.content);
+            };
+            self.vditor.show = true;
+        },
+
+        vditor_close: function() {
+            let self = this;
+            if (self.contentEditor.getValue) {
+                self.editor.content = self.contentEditor.getValue();
+            };
+            self.vditor.show = false;
+        },
+
+        vditor_save: function() {
+            let self = this;
+            self.vditor_close();
+            self.editor_save();
+        },
 
         sync: function() {
             let self = this;
@@ -254,6 +279,7 @@ var the_vue = new Vue({
                     self.editor.content = "";
                     self.status.current_page = 6;
                     if (self.contentEditor.setValue) {
+                        // console.log(self.editor.content);
                         self.contentEditor.setValue(self.editor.content);
                     };
                 },
@@ -264,7 +290,11 @@ var the_vue = new Vue({
                     location.hash = hash;
                 } else if (hash.slice(0,4)=="post") {
                     let noteID = hash.slice(5, hash.length);
-                    self.push_toptip('info', `${noteID}`);
+                    if (location.hash != `#${hash}`) {
+                        // console.log(`${location.hash} != #${hash}`);
+                        location.hash = hash;
+                        self.push_toptip('info', `${noteID}`);
+                    };
                     //
                     let xx = self.notes.filter(x=>x.objectId==noteID)[0];
                     if (xx) {
@@ -278,8 +308,8 @@ var the_vue = new Vue({
                         self.editor.objectId = "";
                     };
                     self.status.current_page = 6;
-                    location.hash = hash;
                     if (self.contentEditor.setValue) {
+                        // console.log(self.editor.content);
                         self.contentEditor.setValue(self.editor.content);
                     };
                 } else {

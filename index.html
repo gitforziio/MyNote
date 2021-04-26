@@ -40,7 +40,7 @@
       position: fixed;
       top: 1rem;
       right: 1rem;
-      z-index: 2050;
+      z-index: 2060;
       display: none;
       width: 360px;
       max-width: 80vw;
@@ -53,7 +53,25 @@
     }
 
     #page-login.ready {
+      z-index: 2050;
+    }
+
+    #page-vditor {
+      height: 100vh;
+      top: -100vh;
+      bottom: 100vh;
       z-index: 2040;
+      /*z-index: 0;*/
+    }
+    #page-vditor.show {
+      height: 100vh;
+      top: -0vh;
+      bottom: 0vh;
+      /*z-index: 2040;*/
+    }
+
+    #vditor {
+      height: 100%;
     }
 
     #editor-textarea {
@@ -103,7 +121,7 @@
       position:absolute;
       top:0; right:0; bottom:0; left:0;
       overflow: auto;
-      z-index: 2040;
+      z-index: 2050;
       background-color: var(--BG);
     }
     .page {
@@ -111,6 +129,7 @@
       top:0; right:0; bottom:0; left:0;
       overflow: auto;
       background-color: var(--BG);
+      z-index: 10;
     }
 
     .panel-wrap {
@@ -181,13 +200,13 @@
     <transition name="slide" mode="out-in">
       <div class="d-flex flex-column panel" id="notes" key="tab_0" v-if="ui.tab_current==0">
         <div class="container d-flex py-2 align-items-center justify-content-between text-center tabbar">
-          <div class="tabbar-tab-wrap mx-2">
+          <div class="tabbar-tab-wrap">
             <button class="btn btn-sm btn-outline-secondary" v-on:click="sync"><i class="fas fa-sync" :class="{'fa-spin': status.syncing}"></i></button>
           </div>
-          <div class="tabbar-tab-wrap mx-2 text-secondary">
+          <div class="tabbar-tab-wrap text-secondary">
             <div><span class="fs-5 fw-bold">MyNote</span></div>
           </div>
-          <div class="tabbar-tab-wrap mx-2">
+          <div class="tabbar-tab-wrap">
             <button class="btn btn-sm btn-outline-secondary" v-on:click="go_hash('page-edit')"><i class="fa fa-plus-square"></i></button>
           </div>
         </div>
@@ -210,13 +229,13 @@
       </div>
       <div class="d-flex flex-column panel" id="tools" key="tab_1" v-if="ui.tab_current==1">
         <div class="container d-flex py-2 align-items-center justify-content-between text-center tabbar">
-          <div class="tabbar-tab-wrap mx-2">
+          <div class="tabbar-tab-wrap">
             <div></div>
           </div>
-          <div class="tabbar-tab-wrap mx-2 text-secondary">
+          <div class="tabbar-tab-wrap text-secondary">
             <div><span class="fs-5 fw-bold">实用工具</span></div>
           </div>
-          <div class="tabbar-tab-wrap mx-2">
+          <div class="tabbar-tab-wrap">
             <div></div>
           </div>
         </div>
@@ -266,13 +285,13 @@
       </div>
       <div class="d-flex flex-column panel" id="me" key="tab_2" v-if="ui.tab_current==2">
         <div class="container d-flex py-2 align-items-center justify-content-between text-center tabbar">
-          <div class="tabbar-tab-wrap mx-2">
+          <div class="tabbar-tab-wrap">
             <div></div>
           </div>
-          <div class="tabbar-tab-wrap mx-2 text-secondary">
+          <div class="tabbar-tab-wrap text-secondary">
             <div><span class="fs-5 fw-bold">{{status.username}}</span></div>
           </div>
-          <div class="tabbar-tab-wrap mx-2">
+          <div class="tabbar-tab-wrap">
             <div></div>
           </div>
         </div>
@@ -323,13 +342,13 @@
 <div class="d-flex flex-column text-center page layer-upper" id="page-add_post_gzh" ref="page_add_post_gzh" key="page_add_post_gzh" v-if="pages[status.current_page]=='add_post_gzh'">
   <div class="d-flex flex-column panel">
     <div class="container d-flex py-2 align-items-center justify-content-between text-center tabbar">
-      <div class="tabbar-tab-wrap mx-2">
+      <div class="tabbar-tab-wrap">
         <button class="btn btn-sm btn-outline-secondary" v-on:click="go_hash(`tools`)"><i class="fas fa-chevron-left"></i></button>
       </div>
-      <div class="tabbar-tab-wrap mx-2 text-secondary">
+      <div class="tabbar-tab-wrap text-secondary">
         <div><span class="fs-5 fw-bold">公众号文章收藏</span></div>
       </div>
-      <div class="tabbar-tab-wrap mx-2">
+      <div class="tabbar-tab-wrap">
         <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-ellipsis-h"></i></button>
       </div>
     </div>
@@ -383,13 +402,13 @@
 <div class="d-flex flex-column text-center page layer-upper" id="page-please" ref="page_please" key="page_please" v-if="pages[status.current_page]=='please'">
   <div class="d-flex flex-column panel">
     <div class="container d-flex py-2 align-items-center justify-content-between text-center tabbar">
-      <div class="tabbar-tab-wrap mx-2">
+      <div class="tabbar-tab-wrap">
         <button class="btn btn-sm btn-outline-secondary" v-on:click="go_hash(`tools`)"><i class="fas fa-chevron-left"></i></button>
       </div>
-      <div class="tabbar-tab-wrap mx-2 text-secondary">
+      <div class="tabbar-tab-wrap text-secondary">
         <div><span class="fs-5 fw-bold">敬请期待</span></div>
       </div>
-      <div class="tabbar-tab-wrap mx-2">
+      <div class="tabbar-tab-wrap">
         <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-ellipsis-h"></i></button>
       </div>
     </div>
@@ -409,13 +428,14 @@
 <div class="d-flex flex-column text-center page layer-upper" id="page-edit" ref="page_edit" key="page_edit" v-if="pages[status.current_page]=='edit'">
   <div class="d-flex flex-column panel">
     <div class="container d-flex py-2 align-items-center justify-content-between text-center tabbar">
-      <div class="tabbar-tab-wrap mx-2">
+      <div class="tabbar-tab-wrap">
         <button class="btn btn-sm btn-outline-secondary" v-on:click="go_hash(`notes`)"><i class="fas fa-chevron-left"></i></button>
       </div>
-      <!-- <div class="tabbar-tab-wrap mx-2 text-secondary">
+      <!-- <div class="tabbar-tab-wrap text-secondary">
         <div><span class="fs-5 fw-bold">编辑</span></div>
       </div> -->
-      <div class="tabbar-tab-wrap mx-2">
+      <div class="tabbar-tab-wrap">
+        <button class="btn btn-sm btn-outline-secondary" v-on:click="vditor_open"><i class="far fa-edit"></i></button>
         <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-ellipsis-h"></i></button>
         <button class="btn btn-sm btn-outline-secondary" :disabled="!editor.content" v-on:click="editor_save"><span v-if="0"><i class="fas fa-spinner fa-pulse"></i></span><span __v-if="1"><i class="far fa-save"></i></span></button>
       </div>
@@ -492,7 +512,7 @@
 
 
 <!-- toasts -->
-<div class="layer" id="wrap-toasts" ref="wrap_toasts"><transition name="fade_toast" v-for="toast in ui.toasts">
+<!-- <div class="layer" id="wrap-toasts" ref="wrap_toasts"><transition name="fade_toast" v-for="toast in ui.toasts">
   <div :mynote--toast-type="toast.type" v-if="toast.show">
     <div class="weui-mask_transparent"></div>
     <div class="weui-toast" :class="{'weui-toast_text': true||toast.type=='text'}">
@@ -504,12 +524,12 @@
       <p class="weui-toast__content">{{toast.content}}</p>
     </div>
   </div>
-</transition></div>
+</transition></div> -->
 
 <!-- toptips -->
-<div class="layer" id="wrap-toptips" ref="wrap_toptips"><transition name="fade_toptip" v-for="toptip in ui.toptips">
+<!-- <div class="layer" id="wrap-toptips" ref="wrap_toptips"><transition name="fade_toptip" v-for="toptip in ui.toptips">
   <div v-if="toptip.show" class="weui-toptips" :class="{'weui-toptips_warn': toptip.type=='warn'}">{{toptip.content}}</div>
-</transition></div>
+</transition></div> -->
 
 <!-- Alert -->
 <div class="alert-wrap" style="display: block;" ref="alert_wrap">
@@ -522,7 +542,33 @@
 
 
 
-<div id="vditor" style="display: none;"></div>
+<!-- vditor -->
+<div class="d-flex flex-column text-center page layer-upper" :class="{'show': vditor.show}" id="page-vditor" ref="page_vditor" key="page_vditor">
+  <div class="d-flex flex-column panel">
+    <div class="container d-flex py-2 align-items-center justify-content-between text-center tabbar">
+      <div class="tabbar-tab-wrap">
+        <button class="btn btn-sm btn-outline-secondary" v-on:click="vditor_close"><i class="fas fa-chevron-left"></i></button>
+      </div>
+      <!-- <div class="tabbar-tab-wrap text-secondary">
+        <div><span class="fs-5 fw-bold">编辑</span></div>
+      </div> -->
+      <div class="tabbar-tab-wrap">
+        <!-- <button class="btn btn-sm btn-outline-secondary"><i class="far fa-edit"></i></button> -->
+        <!-- <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-ellipsis-h"></i></button> -->
+        <button class="btn btn-sm btn-outline-secondary" :disabled="!editor.content" v-on:click="vditor_save"><span v-if="0"><i class="fas fa-spinner fa-pulse"></i></span><span __v-if="1"><i class="far fa-save"></i></span></button>
+      </div>
+    </div>
+    <div class="tool-wrap text-start">
+      <div class="container h-100 pb-2">
+        <!-- <div class="row mt-4 mb-2 text-center text-secondary">
+          <div class="col col-12 my-2"> -->
+            <div id="vditor"></div>
+          <!-- </div>
+        </div> -->
+      </div>
+    </div>
+  </div>
+</div>
 
 
 <!-- --- -->
