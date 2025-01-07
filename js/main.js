@@ -1,15 +1,16 @@
 // var vConsole = new VConsole();
 
-function get_title(text) {
-    let ll = text.trimLeft().split("\n");
-    return ll[0].length > 63 ? `${ll[0].slice(0,63)}...` : ll[0]
-}
+// function get_title(text) {
+//     let ll = (this.should_decode ? this.base64_decode(text) : text).trimLeft().split("\n");
+//     return ll[0].length > 63 ? `${ll[0].slice(0,63)}...` : ll[0]
+// }
 
-function get_desc(text) {
-    text = text.replace(/\n+/, "\n");
-    let ll = text.trimLeft().split("\n");
-    return ll[1]? ll.slice(1, ll.length).join(" ") : ll[0]
-}
+// function get_desc(text) {
+//     text = (this.should_decode ? this.base64_decode(text) : text);
+//     text = text.replace(/\n+/, "\n");
+//     let ll = text.trimLeft().split("\n");
+//     return ll[1]? ll.slice(1, ll.length).join(" ") : ll[0]
+// }
 
 function display_date(date) {
     return `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`
@@ -125,6 +126,7 @@ var the_vue = new Vue({
             result_obj: {},
         },
         //
+        "should_decode": false,
     },
     computed: {
         dark_mode: function() {
@@ -139,6 +141,24 @@ var the_vue = new Vue({
 
 
     methods: {
+
+        get_title: function(text) {
+            let ll = (this.should_decode ? this.base64_decode(text) : text).trimLeft().split("\n");
+            return ll[0].length > 63 ? `${ll[0].slice(0,63)}...` : ll[0]
+        },
+        get_desc: function(text) {
+            text = (this.should_decode ? this.base64_decode(text) : text);
+            text = text.replace(/\n+/, "\n");
+            let ll = text.trimLeft().split("\n");
+            return ll[1]? ll.slice(1, ll.length).join(" ") : ll[0]
+        },
+
+        base64_encode: function(text) {
+            return Base64.encode(text);
+        },
+        base64_decode: function(text) {
+            return Base64.decode(text);
+        },
 
         vditor_open: function() {
             let self = this;
@@ -652,6 +672,7 @@ var the_vue = new Vue({
         let self = this;
     },
     mounted() {
+        // console.log({Base64});
         let self = this;
         // alert("mounted");
         try {

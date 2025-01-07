@@ -220,7 +220,7 @@
             <button class="btn btn-sm btn-outline-secondary" v-on:click="sync"><i class="fas fa-sync" :class="{'fa-spin': status.syncing}"></i></button>
           </div>
           <div class="tabbar-tab-wrap text-secondary">
-            <div><span class="fs-5 fw-bold">MyNote</span></div>
+            <div><span class="fs-5 fw-bold" v-on:click="should_decode=!should_decode">MyNote</span></div>
           </div>
           <div class="tabbar-tab-wrap">
             <button class="btn btn-sm btn-outline-secondary" v-on:click="go_hash('page-edit')"><i class="fa fa-plus-square"></i></button>
@@ -592,7 +592,8 @@
 <script src="https://cdn.bootcdn.net/ajax/libs/store.js/2.0.9/store.legacy.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vditor@3.8.4/dist/index.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/leancloud-storage@5.0.0-beta.0/dist/browser/lc.min.js"></script>
-<!-- <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/js-base64@3.7.7/base64.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
 <!-- <script src="https://cdn.bootcdn.net/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script> -->
 <script src="https://cdn.bootcss.com/vue/2.6.11/vue.min.js"></script>
 <!-- <script src="https://cdn.bootcdn.net/ajax/libs/vue-router/3.5.1/vue-router.min.js"></script> -->
